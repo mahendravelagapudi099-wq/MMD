@@ -299,7 +299,7 @@ const StudentPortal = () => {
             {/* --- Detail Modal --- */}
             {selectedCert && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-xl p-4 animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-300 scrollbar-hide">
+                    <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-300 scrollbar-hide">
 
                         <button
                             onClick={() => setSelectedCert(null)}
@@ -308,9 +308,9 @@ const StudentPortal = () => {
                             <X className="h-6 w-6" />
                         </button>
 
-                        <div className="grid md:grid-cols-5 h-full">
+                        <div className="grid grid-cols-1 md:grid-cols-5 h-full">
                             {/* Left Column: QR & Meta */}
-                            <div className="md:col-span-2 bg-gray-50/50 p-10 flex flex-col items-center justify-center space-y-8 border-r border-gray-100">
+                            <div className="md:col-span-2 bg-gray-50/50 p-6 md:p-10 flex flex-col items-center justify-center space-y-8 border-b md:border-b-0 md:border-r border-gray-100">
                                 <div className="relative group">
                                     <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] blur-2xl group-hover:bg-primary/20 transition duration-700" />
                                     <div className="relative bg-white p-5 rounded-[2.5rem] shadow-xl border-4 border-white shadow-blue-100/50">
@@ -358,7 +358,7 @@ const StudentPortal = () => {
                             </div>
 
                             {/* Right Column: Actions & Preview */}
-                            <div className="md:col-span-3 p-10 space-y-10">
+                            <div className="md:col-span-3 p-6 md:p-10 space-y-10">
                                 <div className="space-y-6">
                                     <header>
                                         <h2 className="text-3xl font-black text-gray-900 tracking-tight">{selectedCert.courseName}</h2>

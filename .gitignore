@@ -46,3 +46,9 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Misc
+compile_output.txt
+*.log
+.vscode/
+.idea/

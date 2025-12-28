@@ -43,7 +43,7 @@ const Navbar = () => {
     return (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-18 items-center">
+                <div className="flex justify-between h-16 items-center">
                     {/* Logo Area */}
                     <Link to="/" className="flex items-center space-x-2.5 hover:opacity-90 transition">
                         <div className="bg-primary p-2 rounded-xl text-white shadow-md shadow-blue-200">
@@ -103,7 +103,7 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden absolute top-18 inset-x-0 bg-white border-b border-gray-100 shadow-xl overflow-hidden animate-in slide-in-from-top duration-300">
+                <div className="md:hidden absolute top-16 inset-x-0 bg-white border-b border-gray-100 shadow-xl overflow-hidden animate-in slide-in-from-top duration-300">
                     <div className="p-4 space-y-2">
                         {navLinks.map((link) => (
                             <Link
