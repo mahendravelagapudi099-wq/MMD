@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { issueCertificateOnChain, connectWallet, getTransactionHistory } from "../utils/blockchain";
 import { generateCertId, hashCertificateData, formatDate } from "../utils/helpers";
+import { sendCertificateEmail } from "../utils/emailUtils";
 import { onAuthStateChanged } from "firebase/auth";
 import {
     PlusCircle,
@@ -33,7 +34,8 @@ import {
     Users,
     Calendar,
     Zap,
-    History
+    History,
+    Mail
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -45,7 +47,8 @@ const InstitutionDashboard = () => {
         courseName: "",
         grade: "First Class",
         issueDate: new Date().toISOString().split("T")[0],
-        email: ""
+        email: "",
+        institutionName: "MDM Maritime Academy"
     });
 
     const [loading, setLoading] = useState(false);
@@ -61,6 +64,8 @@ const InstitutionDashboard = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [txLimit, setTxLimit] = useState(3);
+    const [loadingTx, setLoadingTx] = useState(false);
     const itemsPerPage = 10;
 
     // --- Fetch Data ---
@@ -86,9 +91,15 @@ const InstitutionDashboard = () => {
         }
     };
 
-    const fetchTxHistory = async () => {
-        const history = await getTransactionHistory(5);
-        setTxHistory(history);
+    const fetchTxHistory = async (newLimit = txLimit) => {
+        setLoadingTx(true);
+        try {
+            const history = await getTransactionHistory(newLimit);
+            setTxHistory(history);
+            setTxLimit(newLimit);
+        } finally {
+            setLoadingTx(false);
+        }
     };
 
     useEffect(() => {
@@ -213,16 +224,27 @@ const InstitutionDashboard = () => {
 
             await setDoc(doc(db, "certificates", certId), certData);
 
+            // Trigger Automated Email (Step 1 of Workflow)
+            if (certData.email) {
+                try {
+                    await sendCertificateEmail(certData);
+                } catch (emailErr) {
+                    console.error("Auto-email failed:", emailErr);
+                    // We don't block the UI success for email failure, but we log it.
+                }
+            }
+
             setSuccessData(certData);
             setIssuingStep(6); // Done
-            setFormData({
+            setFormData(prev => ({
                 studentName: "",
                 studentId: "",
                 courseName: "",
                 grade: "First Class",
                 issueDate: new Date().toISOString().split("T")[0],
-                email: ""
-            });
+                email: "",
+                institutionName: prev.institutionName
+            }));
             fetchCertificates();
         } catch (err) {
             console.error(err);
@@ -362,6 +384,19 @@ const InstitutionDashboard = () => {
                                 />
                             </div>
                             <div className="space-y-1">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Institution Name</label>
+                                <input
+                                    type="text"
+                                    name="institutionName"
+                                    required
+                                    className="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-50 rounded-2xl focus:bg-white focus:border-primary transition-all outline-none"
+                                    placeholder="e.g. MREM College"
+                                    value={formData.institutionName}
+                                    onChange={handleInputChange}
+                                    disabled={loading}
+                                />
+                            </div>
+                            <div className="space-y-1">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Student ID</label>
                                 <input
                                     type="text"
@@ -493,24 +528,41 @@ const InstitutionDashboard = () => {
                         </div>
 
                         <div className="space-y-4 relative">
-                            {txHistory.length > 0 ? txHistory.map((tx, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/50 transition duration-300">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                                        <div>
-                                            <p className="font-mono text-[10px] text-gray-300 group-hover:text-white transition">{tx.hash}</p>
-                                            <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-2">
-                                                <span>Block #{tx.blockNumber}</span>
-                                                <span className="opacity-20">•</span>
-                                                <span>{new Date(tx.timestamp * 1000).toLocaleTimeString()}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className="px-3 py-1 bg-success/10 text-success text-[8px] font-black uppercase tracking-widest rounded-lg">
-                                        Confirmed
-                                    </span>
+                            {loadingTx && (
+                                <div className="absolute inset-0 bg-gray-900/10 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-2xl">
+                                    <Loader2 className="h-6 w-6 text-primary animate-spin" />
                                 </div>
-                            )) : (
+                            )}
+                            {txHistory.length > 0 ? (
+                                <>
+                                    {txHistory.map((tx, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/50 transition duration-300">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                                                <div className="max-w-[200px] md:max-w-xs">
+                                                    <p className="font-mono text-[10px] text-gray-300 group-hover:text-white transition truncate">{tx.hash}</p>
+                                                    <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-2">
+                                                        <span>Block #{tx.blockNumber}</span>
+                                                        <span className="opacity-20">•</span>
+                                                        <span>{new Date(tx.timestamp * 1000).toLocaleTimeString()}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="px-3 py-1 bg-success/10 text-success text-[8px] font-black uppercase tracking-widest rounded-lg flex-shrink-0">
+                                                Confirmed
+                                            </span>
+                                        </div>
+                                    ))}
+                                    {txHistory.length >= txLimit && (
+                                        <button
+                                            onClick={() => fetchTxHistory(txLimit + 3)}
+                                            className="w-full py-3 bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400 rounded-xl border border-dashed border-white/10 transition"
+                                        >
+                                            Load More History
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
                                 <div className="py-10 text-center opacity-30">
                                     <History className="h-10 w-10 mx-auto mb-2" />
                                     <p className="text-[10px] font-black uppercase">No local transactions found</p>
@@ -659,6 +711,10 @@ const InstitutionDashboard = () => {
                                 <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Course</span>
                                 <span className="font-bold text-gray-900">{formData.courseName}</span>
                             </div>
+                            <div className="flex justify-between items-center px-2">
+                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Institution</span>
+                                <span className="font-bold text-gray-900">{formData.institutionName}</span>
+                            </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -688,7 +744,10 @@ const InstitutionDashboard = () => {
                         <div className="text-center space-y-3 relative z-10">
                             <CheckCircle className="h-16 w-16 text-success mx-auto drop-shadow-lg" />
                             <h3 className="text-4xl font-black text-gray-900 tracking-tight">Success!</h3>
-                            <p className="text-gray-500 font-medium">The certificate has been anchored successfully.</p>
+                            <p className="text-gray-500 font-medium">
+                                The certificate has been anchored successfully.
+                                {successData.email && " An automated notification has been sent to the student."}
+                            </p>
                         </div>
 
                         <div className="flex flex-col md:flex-row items-center gap-10 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100">
@@ -716,6 +775,13 @@ const InstitutionDashboard = () => {
                                     >
                                         View On-Chain
                                     </Link>
+                                    <a
+                                        href={`mailto:${successData.email}?subject=Your Certificate is Ready!&body=Hello ${successData.studentName}, your certificate for ${successData.courseName} from ${successData.institutionName} has been issued and anchored on the blockchain. Verifiable at: ${window.location.origin}/verify/${successData.certId}`}
+                                        className="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-black text-center hover:bg-blue-600 transition flex items-center justify-center gap-2"
+                                    >
+                                        <Mail className="h-3 w-3" />
+                                        Share to Student
+                                    </a>
                                 </div>
                             </div>
                         </div>

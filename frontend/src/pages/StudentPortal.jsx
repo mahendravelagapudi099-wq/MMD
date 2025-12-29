@@ -438,6 +438,10 @@ const StudentPortal = () => {
                                                     <p className="text-lg font-bold text-gray-900">{selectedCert?.grade}</p>
                                                 </div>
                                                 <div className="text-center">
+                                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Institution</p>
+                                                    <p className="text-lg font-bold text-gray-900">{selectedCert?.institutionName}</p>
+                                                </div>
+                                                <div className="text-center">
                                                     <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Issue Date</p>
                                                     <p className="text-lg font-bold text-gray-900">{formatDate(selectedCert?.issueDate)}</p>
                                                 </div>

@@ -52,12 +52,21 @@ const Home = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <h1 className="text-5xl md:text-7xl font-black text-primary tracking-tight leading-[1.1]">
-                        Trusted Maritime <br />
-                        <span className="text-secondary font-extrabold">Document Management</span>
+                    <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-[1] animate-in slide-in-from-bottom-8 duration-700">
+                        Maritime <br />
+                        <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                            Document Management
+                        </span>
                     </h1>
-                    <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                        MDM is a secure, tamper-proof, blockchain-based platform for issuing, managing, and verifying maritime documents worldwide. Ensuring immutable records through decentralized verification.
+                    <div className="flex items-center justify-center space-x-4 text-sm font-black uppercase tracking-[0.2em] text-gray-400 animate-in fade-in delay-500">
+                        <span>Secure</span>
+                        <span className="h-1 w-1 bg-primary rounded-full" />
+                        <span>Organized</span>
+                        <span className="h-1 w-1 bg-primary rounded-full" />
+                        <span>Compliant</span>
+                    </div>
+                    <p className="text-xl md:text-2xl text-gray-500 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-4 delay-700">
+                        The gold standard in maritime verification. MDM provides a bulletproof, blockchain-anchored ledger for managing global maritime credentials.
                     </p>
                 </div>
 

@@ -21,6 +21,7 @@ export const hashCertificateData = (data) => {
         "courseName",
         "email",
         "grade",
+        "institutionName",
         "issueDate",
         "studentId",
         "studentName"

@@ -96,12 +96,14 @@ export const getTransactionHistory = async (limit = 10) => {
             const block = await provider.getBlock(Number(latestBlock) - i, true);
             if (block && block.transactions.length > 0) {
                 block.transactions.forEach(txHash => {
-                    history.push({
-                        hash: typeof txHash === 'string' ? txHash : txHash.hash,
-                        blockNumber: block.number,
-                        timestamp: block.timestamp,
-                        status: "Confirmed (Local)"
-                    });
+                    if (history.length < limit) {
+                        history.push({
+                            hash: typeof txHash === 'string' ? txHash : txHash.hash,
+                            blockNumber: block.number,
+                            timestamp: block.timestamp,
+                            status: "Confirmed (Local)"
+                        });
+                    }
                 });
             }
             if (history.length >= limit) break;

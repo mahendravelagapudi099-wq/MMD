@@ -45,13 +45,13 @@ const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
                     {/* Logo Area */}
-                    <Link to="/" className="flex items-center space-x-3 hover:opacity-90 transition">
-                        <div className="bg-primary p-2 rounded-lg text-white shadow-sm">
-                            <Anchor className="h-6 w-6" />
+                    <Link to="/" className="flex items-center space-x-3.5 group transition-all">
+                        <div className="bg-primary/10 p-2.5 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                            <Anchor className="h-6 w-6 group-hover:rotate-12 transition-transform" />
                         </div>
                         <div className="flex flex-col leading-none">
-                            <span className="text-xl font-black text-primary tracking-tighter">MDM</span>
-                            <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Maritime Document Management</span>
+                            <span className="text-2xl font-black text-gray-900 tracking-tighter">MDM<span className="text-primary italic">.</span></span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-primary transition-colors">Maritime Systems</span>
                         </div>
                     </Link>
 

@@ -141,6 +141,7 @@ const VerificationPage = () => {
                 studentId: dbData.studentId,
                 courseName: dbData.courseName,
                 grade: dbData.grade,
+                institutionName: dbData.institutionName,
                 issueDate: dbData.issueDate,
                 email: dbData.email,
                 certId: finalCertId
@@ -221,7 +222,8 @@ const VerificationPage = () => {
                 ...manualData,
                 certId: actualCertId,
                 issueDate: dbData?.issueDate || "",
-                email: dbData?.email || ""
+                email: dbData?.email || "",
+                institutionName: dbData?.institutionName || ""
             });
 
             if (manualHash === certHashOnChain) {
@@ -568,6 +570,7 @@ const ValidResult = ({ result, setResult, generateReport, setShowReceipt }) => (
                 <div className="space-y-6">
                     <DetailRow icon={User} label="Recipient" value={result.data.studentName} subValue={result.data.studentId} />
                     <DetailRow icon={Award} label="Course" value={result.data.courseName} />
+                    <DetailRow icon={ShieldCheck} label="Institution" value={result.data.institutionName || "Authorized MDM Body"} />
                     <DetailRow icon={Hash} label="Grade / Status" value={result.data.grade} />
                     <DetailRow icon={Calendar} label="Issue Date" value={formatDate(result.data.issueDate)} />
                 </div>
