@@ -1,20 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     ShieldCheck,
-    Award,
-    CheckCircle,
+    Anchor,
     Search,
-    Zap,
-    Lock,
     Globe,
-    Upload,
-    Fingerprint,
-    Link as LinkIcon
+    FileCheck,
+    Lock,
+    History,
+    Key,
+    UserPlus,
+    LayoutDashboard
 } from "lucide-react";
 import { auth, getUserRole } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
 
 const Home = () => {
     const [user, setUser] = useState(null);
@@ -38,156 +37,183 @@ const Home = () => {
         return role === "institution" ? "/institution" : "/student";
     };
 
-    const getCTAText = () => {
-        if (!user) return "Issue Now";
-        return role === "institution" ? "Go to Issuance" : "View My Portal";
+    const getIssuanceText = () => {
+        if (!user) return "Go to Issuance";
+        return role === "institution" ? "Go to Issuance" : "Access Professional Portal";
     };
+
     return (
-        <div className="space-y-24 py-16">
+        <div className="space-y-32 pb-24">
             {/* Hero Section */}
-            <header className="relative text-center space-y-8 max-w-4xl mx-auto px-4">
-                <div className="inline-flex items-center space-x-2 bg-blue-50 text-primary px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4 animate-in fade-in zoom-in-50 duration-700">
-                    <Zap className="h-4 w-4 fill-primary" />
-                    <span>Web3 Powered Verification</span>
+            <header className="relative pt-20 pb-16 text-center space-y-10 max-w-5xl mx-auto px-4">
+                <div className="inline-flex items-center space-x-2 bg-gray-50 border border-gray-100 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-primary">
+                    <div className="h-1.5 w-1.5 bg-secondary rounded-full animate-pulse" />
+                    <span>Blockchain Credibility: Polygon Mainnet</span>
                 </div>
-                <h1 className="text-6xl md:text-7xl font-black text-gray-900 tracking-tighter leading-[1.05] animate-in slide-in-from-bottom-8 duration-700">
-                    The Proof of Your <br />
-                    <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent italic">Achievements</span>
-                </h1>
-                <p className="text-xl md:text-2xl text-gray-500 leading-relaxed font-medium max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 delay-200 duration-700">
-                    A tamper-proof decentralized registry for academic certificates. Verify credentials instantly on the Polygon blockchain.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-6 animate-in fade-in slide-in-from-bottom-8 delay-300 duration-700">
+
+                <div className="space-y-6">
+                    <h1 className="text-5xl md:text-7xl font-black text-primary tracking-tight leading-[1.1]">
+                        Trusted Maritime <br />
+                        <span className="text-secondary font-extrabold">Document Management</span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                        MDM is a secure, tamper-proof, blockchain-based platform for issuing, managing, and verifying maritime documents worldwide. Ensuring immutable records through decentralized verification.
+                    </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-5 pt-8">
                     <Link
                         to={getCTALink()}
-                        className="w-full sm:w-auto bg-primary text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-blue-600 transition shadow-xl shadow-blue-200 active:scale-95"
+                        className="w-full sm:w-auto bg-primary text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-opacity-90 transition shadow-lg active:scale-[0.98]"
                     >
-                        {getCTAText()}
+                        {getIssuanceText()}
                     </Link>
-                    <div className="relative group w-full sm:w-80">
-                        <input
-                            type="text"
-                            placeholder="Verify by Certificate ID..."
-                            className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-primary outline-none transition-all shadow-sm"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') window.location.href = `/verify/${e.currentTarget.value}`;
-                            }}
-                        />
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-300 group-focus-within:text-primary transition" />
-                    </div>
+                    <Link
+                        to="/verify/public"
+                        className="w-full sm:w-auto bg-white border-2 border-primary text-primary px-10 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition active:scale-[0.98]"
+                    >
+                        Verify Document
+                    </Link>
                 </div>
             </header>
 
-            {/* Stats/Logo Cloud (Subtle) */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale max-w-5xl mx-auto px-4">
-                {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="flex items-center justify-center space-x-2">
-                        <Globe className="h-6 w-6" />
-                        <span className="font-bold tracking-tighter text-xl">TRUSTED_ORG_{i}</span>
+            {/* Verification Section */}
+            <section className="max-w-4xl mx-auto px-4">
+                <div className="bg-gray-900 rounded-2xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <ShieldCheck className="h-32 w-32" />
                     </div>
-                ))}
-            </div>
+                    <div className="relative z-10 space-y-8">
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-bold">Instant Global Verification</h2>
+                            <p className="text-gray-400">Emphasize instant and global verification. Enter the document reference below.</p>
+                        </div>
+                        <div className="relative group max-w-2xl">
+                            <input
+                                type="text"
+                                placeholder="Enter Document ID or Reference Number"
+                                className="w-full pl-14 pr-6 py-5 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-secondary focus:bg-white/20 outline-none transition-all text-lg placeholder:text-white/30"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') window.location.href = `/verify/${e.currentTarget.value}`;
+                                }}
+                            />
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-white/40 group-focus-within:text-secondary transition" />
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            {/* How it Works Section */}
-            <section className="relative px-4 overflow-hidden py-16 rounded-[3rem] bg-gray-900 text-white">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full" />
-                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full" />
+            {/* Trusted By Section */}
+            <section className="max-w-6xl mx-auto px-4 text-center space-y-12">
+                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-400">Trusted by Maritime Authorities & Institutions</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center opacity-60">
+                    <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
+                        <Anchor className="h-10 w-10 text-primary" />
+                        <span className="font-bold text-sm">Port Authorities</span>
+                    </div>
+                    <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
+                        <Globe className="h-10 w-10 text-primary" />
+                        <span className="font-bold text-sm">Maritime Training Institutes</span>
+                    </div>
+                    <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
+                        <FileCheck className="h-10 w-10 text-primary" />
+                        <span className="font-bold text-sm">Shipping Companies</span>
+                    </div>
+                    <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
+                        <ShieldCheck className="h-10 w-10 text-primary" />
+                        <span className="font-bold text-sm">Regulatory Bodies</span>
+                    </div>
+                </div>
+            </section>
 
-                <div className="relative z-10 space-y-16 max-w-6xl mx-auto">
+            {/* How It Works Section */}
+            <section className="bg-gray-50 py-24 px-4 border-y border-gray-100">
+                <div className="max-w-6xl mx-auto space-y-16">
                     <div className="text-center space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight">Simple. Immutable. Secure.</h2>
-                        <p className="text-gray-400 font-medium max-w-xl mx-auto italic">Verification has never been easier or more reliable.</p>
+                        <h2 className="text-4xl font-bold text-primary">How It Works</h2>
+                        <p className="text-gray-500 max-w-xl mx-auto">A streamlined process for maritime document security and verification.</p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-12 relative">
-                        {/* Connection Line (Desktop) */}
-                        <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
-
-                        {/* Step 1 */}
-                        <div className="text-center space-y-6 flex flex-col items-center group">
-                            <div className="bg-gray-800 p-6 rounded-3xl border border-gray-700 group-hover:border-primary transition duration-500">
-                                <Upload className="h-10 w-10 text-primary" />
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-primary font-black text-sm uppercase">Step 01</span>
-                                <h3 className="text-2xl font-black">Anchor Hash</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">Institutions upload a cryptographic hash of the certificate to the Polygon network.</p>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
+                            <div className="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold">01</div>
+                            <div className="space-y-3">
+                                <h4 className="text-xl font-bold">Register Document Hash</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Authorized institutions submit cryptographic hashes of documents to the blockchain.</p>
                             </div>
                         </div>
 
-                        {/* Step 2 */}
-                        <div className="text-center space-y-6 flex flex-col items-center group">
-                            <div className="bg-gray-800 p-6 rounded-3xl border border-gray-700 group-hover:border-primary transition duration-500">
-                                <Fingerprint className="h-10 w-10 text-primary" />
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-primary font-black text-sm uppercase">Step 02</span>
-                                <h3 className="text-2xl font-black">Sign Transaction</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">The issuer signs the record with their private key, establishing ownership and trust.</p>
+                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
+                            <div className="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold">02</div>
+                            <div className="space-y-3">
+                                <h4 className="text-xl font-bold">Authorized Digital Signing</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Issuers sign records using verified private keys, ensuring authenticity.</p>
                             </div>
                         </div>
 
-                        {/* Step 3 */}
-                        <div className="text-center space-y-6 flex flex-col items-center group">
-                            <div className="bg-primary p-6 rounded-3xl border border-primary/50 shadow-2xl shadow-primary/20 hover:scale-105 transition duration-500">
-                                <ShieldCheck className="h-10 w-10 text-white" />
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-primary font-black text-sm uppercase">Step 03</span>
-                                <h3 className="text-2xl font-black">Public Proof</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">Instantly verify the status and authenticity from anywhere in the world.</p>
+                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
+                            <div className="h-12 w-12 bg-secondary/10 text-secondary rounded-lg flex items-center justify-center font-bold">03</div>
+                            <div className="space-y-3">
+                                <h4 className="text-xl font-bold">Instant Global Verification</h4>
+                                <p className="text-gray-500 text-sm leading-relaxed">Documents can be verified anytime, anywhere by anyone with access.</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Features Showcase */}
-            <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 px-4 max-w-7xl mx-auto">
-                <div className="group space-y-6">
-                    <div className="h-14 w-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition duration-500 shadow-md">
-                        <Lock className="h-7 w-7" />
+            {/* Features Section */}
+            <section className="max-w-6xl mx-auto px-4">
+                <div className="grid md:grid-cols-3 gap-16">
+                    <div className="space-y-6">
+                        <div className="h-12 w-12 bg-gray-50 rounded-lg flex items-center justify-center text-primary">
+                            <Lock className="h-6 w-6" />
+                        </div>
+                        <div className="space-y-3">
+                            <h4 className="text-xl font-bold">Enterprise-Grade Privacy</h4>
+                            <p className="text-gray-500 text-sm leading-relaxed">Only cryptographic hashes are stored on-chain, keeping sensitive data private and secure.</p>
+                        </div>
                     </div>
-                    <div className="space-y-3">
-                        <h4 className="text-2xl font-black tracking-tight">Military Grade Privacy</h4>
-                        <p className="text-gray-500 leading-relaxed font-medium">We only store hashes. Your sensitive academic data never leaves your institution's local servers.</p>
-                    </div>
-                </div>
 
-                <div className="group space-y-6">
-                    <div className="h-14 w-14 bg-green-50 text-success rounded-2xl flex items-center justify-center group-hover:bg-success group-hover:text-white transition duration-500 shadow-md">
-                        <Globe className="h-7 w-7" />
+                    <div className="space-y-6">
+                        <div className="h-12 w-12 bg-gray-50 rounded-lg flex items-center justify-center text-primary">
+                            <Globe className="h-6 w-6" />
+                        </div>
+                        <div className="space-y-3">
+                            <h4 className="text-xl font-bold">Global Maritime Interoperability</h4>
+                            <p className="text-gray-500 text-sm leading-relaxed">Built on open blockchain standards for seamless cross-border verification.</p>
+                        </div>
                     </div>
-                    <div className="space-y-3">
-                        <h4 className="text-2xl font-black tracking-tight">Global Interoperability</h4>
-                        <p className="text-gray-500 leading-relaxed font-medium">Built on open ERC standards. Your certificates can be verified across many blockchain explorers.</p>
-                    </div>
-                </div>
 
-                <div className="group space-y-6">
-                    <div className="h-14 w-14 bg-red-50 text-error rounded-2xl flex items-center justify-center group-hover:bg-error group-hover:text-white transition duration-500 shadow-md">
-                        <LinkIcon className="h-7 w-7" />
-                    </div>
-                    <div className="space-y-3">
-                        <h4 className="text-2xl font-black tracking-tight">Smart Revocation</h4>
-                        <p className="text-gray-500 leading-relaxed font-medium">Easily invalidate credentials if errors are found, with a clear on-chain status trail.</p>
+                    <div className="space-y-6">
+                        <div className="h-12 w-12 bg-gray-50 rounded-lg flex items-center justify-center text-primary">
+                            <History className="h-6 w-6" />
+                        </div>
+                        <div className="space-y-3">
+                            <h4 className="text-xl font-bold">Controlled Revocation & Audit Trail</h4>
+                            <p className="text-gray-500 text-sm leading-relaxed">Maintain a transparent status history with controlled revocation capabilities.</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* CTA Footer */}
-            <section className="text-center space-y-10 py-20 px-4 bg-gradient-to-b from-transparent to-blue-50/50 rounded-[4rem]">
-                <div className="space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-black tracking-tight">Ready to Secure the Future?</h2>
-                    <p className="text-gray-500 font-medium max-w-lg mx-auto">Join hundreds of institutions modernizing their academic record systems today.</p>
-                </div>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <Link to="/login" className="bg-gray-900 text-white px-12 py-4 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl active:scale-95">
-                        Register Institution
-                    </Link>
-                    <Link to="/login" className="bg-white border-2 border-primary text-primary px-12 py-4 rounded-2xl font-black text-lg hover:bg-blue-50 transition shadow-sm active:scale-95">
-                        Student Portal
-                    </Link>
+            {/* Call to Action Section */}
+            <section className="max-w-5xl mx-auto px-4">
+                <div className="bg-primary rounded-3xl p-12 text-center text-white space-y-10 shadow-2xl">
+                    <div className="space-y-4">
+                        <h2 className="text-4xl font-bold">Ready to Modernize Maritime Documentation?</h2>
+                        <p className="text-white/70 max-w-xl mx-auto font-medium">Join the global network of maritime authorities using blockchain for secure document management.</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <Link to="/login" className="bg-white text-primary px-10 py-4 rounded-lg font-bold hover:bg-gray-100 transition active:scale-95 flex items-center justify-center space-x-2">
+                            <UserPlus className="h-5 w-5" />
+                            <span>Register Institution</span>
+                        </Link>
+                        <Link to="/login" className="bg-secondary text-white px-10 py-4 rounded-lg font-bold hover:bg-opacity-90 transition active:scale-95 flex items-center justify-center space-x-2">
+                            <LayoutDashboard className="h-5 w-5" />
+                            <span>Access Professional Portal</span>
+                        </Link>
+                    </div>
                 </div>
             </section>
         </div>
@@ -195,3 +221,4 @@ const Home = () => {
 };
 
 export default Home;
+

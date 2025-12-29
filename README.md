@@ -1,34 +1,32 @@
-# MeritRegistry (MDM) - Secure Document Management
+# MDM - Maritime Document Management
 
-A decentralized, blockchain-powered academic credential verification system. MERITREGISTRY ensures that certificates are tamper-proof, immutable, and instantly verifiable across the world using the Polygon blockchain.
+A decentralized, blockchain-powered platform for issuing, managing, and verifying maritime documents securely and globally. MDM ensures that maritime records are tamper-proof, immutable, and instantly verifiable across the world using the Polygon blockchain.
 
 ## 🚀 Key Achievements - Today at a Glance
 
-Today's focus was on enhancing the verification experience, improving accessibility via QR codes, and ensuring the platform is fully responsive for all devices.
+Today's focus was on transforming the platform into a professional, enterprise-grade maritime document management system with a focus on institutional trust and global interoperability.
 
-### 1. Robust Verification Architecture
+### 1. Enterprise Branding & UI Redesign
 
-- **Input Stability**: Refactored the `VerificationPage` to eliminate focus-loss issues and improve input handling for manual claim checks.
-- **Multi-Field Search**: Users can now search by either **Certificate ID** or **Student ID**, providing more flexibility for employers and registrars.
-- **Deep-Link Verification**: Syncing URL parameters with the verification engine allows for instant "one-click" verification from shared links.
+- **Identity Shift**: Transitioned from "MeritRegistry" to **MDM (Maritime Document Management)** throughout the ecosystem.
+- **Maritime Aesthetic**: Implemented a professional Navy Blue and Teal design language, optimized for government bodies and regulatory institutions.
+- **Hero Transformation**: Redesigned the homepage hero section with authoritative messaging and maritime-focused iconography.
 
-### 2. QR Scanning System (Mobile-Ready)
+### 2. Global Verification Engine
 
-- **New QR Scanner Page**: Implemented a real-time viewfinder using `@html5-qrcode` for instant cryptographic decoding from physical certificates.
-- **Integrated Scanning**: Integrated QR access points into the primary navigation and the Public Registry dashboard.
-- **Themed UI**: Customized the scanner interface with high-contrast, security-themed aesthetics to match the MeritRegistry design language.
+- **Instant Lookup**: Enhanced the verification section to emphasize instant and global document integrity checks.
+- **Blockchain Credibility**: Integrated Polygon Mainnet status indicators to highlight cryptographic security.
+- **Mobile Fidelity**: Ensured the new professional portal is fully responsive for field officers and port authorities.
 
-### 3. Responsiveness Audit & UI Refinement
+### 3. Institutional Readiness
 
-- **Mobile-First Optimization**: Audited all core pages (Home, Login, Dashboard, Portal) to ensure a premium experience on phones and tablets.
-- **Adaptive Layouts**: Fixed overflow issues on small screens, particularly with absolutely positioned controls on the Registry page.
-- **UI Standardization**: Standardized Navbar height and refined modal responsiveness in the Student Portal for a consistent "premium" feel.
-- **Repository Established**: Project is now fully version-controlled and pushed to [GitHub](https://github.com/mahendravelagapudi099-wq/MMD.git).
+- **How It Works**: Formalized the document issuance pipeline (Hash Registration -> Digital Signing -> Global Verification).
+- **Interoperability Standards**: Optimized the architecture for open maritime standards and controlled revocation audit trails.
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React, Tailwind CSS (Vanilla aesthetics), Lucide Icons.
-- **Blockchain**: Polygon (Amoy Testnet), Ethers.js.
+- **Frontend**: React, Tailwind CSS (Enterprise-Grade Minimalist), Lucide Icons.
+- **Blockchain**: Polygon Mainnet (Certified Path), Ethers.js.
 - **Storage**: Firebase (Firestore & Auth) for metadata and identity.
 - **Verification**: SHA-256 Cryptographic Hashing.
 
@@ -96,4 +94,4 @@ npm run dev
 - Import one of the private keys provided by `npx hardhat node` into MetaMask.
 
 ---
-*Verified by MeritRegistry Labs. Secure. Private. Permanent.*
+*Verified by MDM Systems. Secure. Private. Global.*

@@ -21,6 +21,7 @@ hardhat-network-helpers-test-report.json
 
 # Environment
 .env
+.env.example
 .env.local
 .env.development.local
 .env.test.local

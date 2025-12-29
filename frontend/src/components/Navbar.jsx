@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { auth, signOutUser, getUserRole } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { ShieldCheck, User, LogOut, Menu, X, ChevronRight, QrCode } from "lucide-react";
+import { Anchor, User, LogOut, Menu, X, ChevronRight, QrCode } from "lucide-react";
 
 const Navbar = () => {
     const [user, setUser] = useState(null);
@@ -41,15 +41,18 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16 items-center">
+                <div className="flex justify-between h-20 items-center">
                     {/* Logo Area */}
-                    <Link to="/" className="flex items-center space-x-2.5 hover:opacity-90 transition">
-                        <div className="bg-primary p-2 rounded-xl text-white shadow-md shadow-blue-200">
-                            <ShieldCheck className="h-6 w-6" />
+                    <Link to="/" className="flex items-center space-x-3 hover:opacity-90 transition">
+                        <div className="bg-primary p-2 rounded-lg text-white shadow-sm">
+                            <Anchor className="h-6 w-6" />
                         </div>
-                        <span className="text-2xl font-black text-gray-900 tracking-tight">Merit<span className="text-primary text-[1.4rem]">Registry</span></span>
+                        <div className="flex flex-col leading-none">
+                            <span className="text-xl font-black text-primary tracking-tighter">MDM</span>
+                            <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Maritime Document Management</span>
+                        </div>
                     </Link>
 
                     {/* Desktop Navigation */}

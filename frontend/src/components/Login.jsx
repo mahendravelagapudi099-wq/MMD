@@ -85,7 +85,7 @@ const Login = () => {
                         {isLogin ? "Welcome Back" : "Create Account"}
                     </h2>
                     <p className="text-gray-500 mt-2">
-                        {isLogin ? "Access your decentralized certificates" : "Join the MeritRegistry network"}
+                        {isLogin ? "Access your decentralized certificates" : "Join the MDM network"}
                     </p>
                 </div>
 

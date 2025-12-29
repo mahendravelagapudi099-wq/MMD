@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { db } from "../utils/firebase";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { getTransactionStatus, getProvider, getContract, getExplorerUrl } from "../utils/blockchain";
+import { getTransactionStatus, getProvider, getContract, getExplorerUrl, connectWallet } from "../utils/blockchain";
 import { hashCertificateData, formatDate } from "../utils/helpers";
 import {
     ShieldCheck,
@@ -39,6 +39,7 @@ const VerificationPage = () => {
     const [error, setError] = useState("");
     const [showReceipt, setShowReceipt] = useState(false);
     const [explorerUrl, setExplorerUrl] = useState("");
+    const [walletAddress, setWalletAddress] = useState("");
 
     // Manual Form States
     const [isManualMode, setIsManualMode] = useState(false);
@@ -60,7 +61,25 @@ const VerificationPage = () => {
             setResult(null);
             setError("");
         }
+        checkConnection();
     }, [urlCertId]);
+
+    const checkConnection = async () => {
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: "eth_accounts" });
+            if (accounts.length > 0) setWalletAddress(accounts[0]);
+        }
+    };
+
+    const handleConnect = async () => {
+        try {
+            setError("");
+            const addr = await connectWallet();
+            if (addr) setWalletAddress(addr);
+        } catch (err) {
+            setError(err.message || "Failed to connect wallet.");
+        }
+    };
 
     const handleVerify = async (idToVerify) => {
         const targetId = (idToVerify || certId || "").trim().replace(/\/$/, "");
@@ -280,6 +299,8 @@ const VerificationPage = () => {
                         setManualData={setManualData}
                         handleVerify={handleVerify}
                         handleManualVerify={handleManualVerify}
+                        walletAddress={walletAddress}
+                        handleConnect={handleConnect}
                     />}
 
             {error && !loading && (
@@ -364,7 +385,9 @@ const SearchState = ({
     manualData,
     setManualData,
     handleVerify,
-    handleManualVerify
+    handleManualVerify,
+    walletAddress,
+    handleConnect
 }) => (
     <div className="max-w-2xl mx-auto space-y-12 py-12 px-4">
         <div className="text-center space-y-4">
@@ -373,6 +396,19 @@ const SearchState = ({
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Public Registry</h1>
             <p className="text-gray-500 font-medium text-base md:text-lg">Instant cryptographic verification of MDM credentials.</p>
+
+            {!walletAddress && (
+                <div className="mt-4 animate-in fade-in slide-in-from-top-4">
+                    <button
+                        onClick={handleConnect}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-black text-xs hover:bg-blue-600 transition shadow-lg shadow-blue-100 active:scale-95"
+                    >
+                        <Zap className="h-3 w-3 fill-white" />
+                        Connect MetaMask to Verify
+                    </button>
+                    <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Required for On-Chain Validation</p>
+                </div>
+            )}
         </div>
 
         <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-gray-100 space-y-8">

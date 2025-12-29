@@ -14,7 +14,10 @@ body {
 }
 
 @theme {
-  --color-primary: #3B82F6;
+  --color-primary: #003366;
+  /* Navy Blue */
+  --color-secondary: #008080;
+  /* Teal */
   --color-success: #10B981;
   --color-error: #EF4444;
 }
