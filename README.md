@@ -1,97 +1,78 @@
-# MDM - Maritime Document Management
+# MDM - Maritime Document Management 🚢
 
-A decentralized, blockchain-powered platform for issuing, managing, and verifying maritime documents securely and globally. MDM ensures that maritime records are tamper-proof, immutable, and instantly verifiable across the world using the Polygon blockchain.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Blockchain: Polygon](https://img.shields.io/badge/Blockchain-Polygon-blueviolet)](https://polygon.technology/)
+[![Frontend: React](https://img.shields.io/badge/Frontend-React-61DAFB)](https://reactjs.org/)
+[![Backend: Firebase](https://img.shields.io/badge/Backend-Firebase-FFCA28)](https://firebase.google.com/)
 
-## 🚀 Key Achievements - Today at a Glance
+**MDM** is a decentralized, blockchain-powered platform designed for the maritime industry to securely issue, manage, and verify crucial documents. By leveraging the Polygon blockchain, MDM ensures all maritime records are tamper-proof, immutable, and instantly verifiable globally.
 
-Today's focus was on transforming the platform into a professional, enterprise-grade maritime document management system with a focus on institutional trust and global interoperability.
+---
 
-### 1. Enterprise Branding & UI Redesign
+## 🏗️ Architecture Overview
 
-- **Identity Shift**: Transitioned from "MeritRegistry" to **MDM (Maritime Document Management)** throughout the ecosystem.
-- **Maritime Aesthetic**: Implemented a professional Navy Blue and Teal design language, optimized for government bodies and regulatory institutions.
-- **Hero Transformation**: Redesigned the homepage hero section with authoritative messaging and maritime-focused iconography.
+The system consists of a modern React frontend, a decentralized smart contract layer on Polygon, and a secure metadata management layer powered by Firebase.
 
-### 2. Global Verification Engine
+```mermaid
+graph TD
+    A[Maritime Authority] -->|Issues Document| B(React Frontend)
+    B -->|Hashes Document| C{SHA-256 Hashing}
+    C -->|Stores Metadata| D(Firebase Firestore)
+    C -->|Registers Hash| E(Polygon Blockchain)
+    F[Global Verifier] -->|Scans QR/Inputs ID| B
+    B -->|Fetches Data| D
+    B -->|Validates Hash| E
+    E -->|Status: Verified| F
+```
 
-- **Instant Lookup**: Enhanced the verification section to emphasize instant and global document integrity checks.
-- **Blockchain Credibility**: Integrated Polygon Mainnet status indicators to highlight cryptographic security.
-- **Mobile Fidelity**: Ensured the new professional portal is fully responsive for field officers and port authorities.
+## ✨ Key Features
 
-### 3. Institutional Readiness
-
-- **How It Works**: Formalized the document issuance pipeline (Hash Registration -> Digital Signing -> Global Verification).
-- **Interoperability Standards**: Optimized the architecture for open maritime standards and controlled revocation audit trails.
+- **Decentralized Trust**: Built on Polygon for institutional-grade security.
+- **Instant Verification**: QR-code based instant verification for port authorities.
+- **Immutable Records**: Once issued, documents cannot be altered or forged.
+- **Professional Dashboard**: Intuitive interface for document issuers and administrators.
+- **Global Accessibility**: Accessible from any corner of the globe for seamless maritime operations.
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React, Tailwind CSS (Enterprise-Grade Minimalist), Lucide Icons.
-- **Blockchain**: Polygon Mainnet (Certified Path), Ethers.js.
-- **Storage**: Firebase (Firestore & Auth) for metadata and identity.
-- **Verification**: SHA-256 Cryptographic Hashing.
+- **Frontend**: React 19, Vite, Tailwind CSS, Lucide Icons.
+- **Blockchain**: Solidity, Hardhat, Ethers.js, Polygon Network.
+- **Services**: Firebase (Authentication & Firestore).
+- **Tools**: `html5-qrcode` for scanning, `jspdf` for document generation.
 
-## 📦 Recent Dependencies
-
-- Installed `html5-qrcode` for the new scanning interface.
-
-## 🛠️ Getting Started
-
-Follow these steps to run the application locally.
+## 🚀 Getting Started
 
 ### 1. Prerequisites
 
-- **Node.js**: v18.x or higher
-- **MetaMask**: Browser extension for blockchain interaction.
+- Node.js (v18+)
+- MetaMask Browser Extension
 
-### 2. Backend Setup (Blockchain)
-
-Open a terminal in the root directory:
+### 2. Installation
 
 ```bash
-# Install root dependencies
+git clone <repository-url>
+cd MDM
 npm install
-
-# Start local Hardhat node
-npx hardhat node
-```
-
-*Keep this terminal running.*
-
-### 3. Deploy Smart Contract
-
-Open a **new** terminal in the root directory:
-
-```bash
-# Deploy to local network
-npx hardhat run scripts/deploy.js --network localhost
-```
-
-*Note the deployed contract address from the output.*
-
-### 4. Frontend Setup
-
-Open a terminal in the `frontend` directory:
-
-```bash
-# Navigate to frontend
 cd frontend
-
-# Install dependencies
 npm install
+```
 
-# Setup Environment
-# Copy .env.example to .env and add your Firebase + Contract details
-cp .env.example .env
+### 3. Environment Setup
 
-# Run development server
+Create a `.env` file in the `frontend` directory based on `.env.example`.
+
+### 4. Running Locally
+
+```bash
+# In the frontend directory
 npm run dev
 ```
 
-### 5. Access the App
+---
 
-- Open `http://localhost:5173` in your browser.
-- Ensure MetaMask is connected to the **Hardhat Local Network** (Chain ID: 31337).
-- Import one of the private keys provided by `npx hardhat node` into MetaMask.
+## 📄 Solution Details
+
+For an in-depth look at how MDM solves maritime documentation challenges, differentiation from other solutions, and detailed architecture, please refer to our [SOLUTION.md](file:///d:/Desktop/MDM/SOLUTION.md).
 
 ---
-*Verified by MDM Systems. Secure. Private. Global.*
+*Empowering Maritime Trust through Blockchain.*
