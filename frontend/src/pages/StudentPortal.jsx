@@ -362,7 +362,7 @@ const StudentPortal = () => {
                                 <div className="space-y-6">
                                     <header>
                                         <h2 className="text-3xl font-black text-gray-900 tracking-tight">{selectedCert.courseName}</h2>
-                                        <p className="text-gray-500 font-medium">Issued by Institution #{selectedCert.issuerId.slice(-4)}</p>
+                                        <p className="text-gray-500 font-medium">Issued by {selectedCert.institutionName || `Institution #${selectedCert.issuerId.slice(-4)}`}</p>
                                     </header>
 
                                     <div className="grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-3xl">
