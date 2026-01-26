@@ -15,16 +15,13 @@ export const generateCertId = () => {
  * Normalizes strings and ensures a consistent set of keys to prevent mismatch.
  */
 export const hashCertificateData = (data) => {
-    // Define the canonical set of keys in a fixed order
+    // Define the canonical set of keys in a fixed order (Integrity-only fields)
     const canonicalKeys = [
         "certId",
-        "courseName",
-        "email",
-        "grade",
-        "institutionName",
-        "issueDate",
         "studentId",
-        "studentName"
+        "courseName",
+        "grade",
+        "issueDate"
     ];
 
     // Create a normalized object with guaranteed keys
@@ -35,7 +32,15 @@ export const hashCertificateData = (data) => {
         normalizedData[key] = (val !== null && val !== undefined) ? String(val).trim() : "";
     });
 
-    const dataString = JSON.stringify(normalizedData);
+    // Sort to ensure absolute determinism
+    const sortedData = Object.keys(normalizedData)
+        .sort()
+        .reduce((obj, key) => {
+            obj[key] = normalizedData[key];
+            return obj;
+        }, {});
+
+    const dataString = JSON.stringify(sortedData);
     return CryptoJS.SHA256(dataString).toString();
 };
 

@@ -1,0 +1,14 @@
+{
+  "certId": "TEST-INTEGRITY-95750",
+  "scenario1": {
+    "expected": "03b130f0c22bb399bacf44c91d314e3462604531f59b04e766f311c2eaeec1f3",
+    "computed": "03b130f0c22bb399bacf44c91d314e3462604531f59b04e766f311c2eaeec1f3",
+    "status": "VERIFIED (REAL)"
+  },
+  "scenario2": {
+    "tamperedGrade": "A+",
+    "expected": "03b130f0c22bb399bacf44c91d314e3462604531f59b04e766f311c2eaeec1f3",
+    "computed": "731ea0b002309d9a4d6bbb60527b1071681aeb560ebfc03e4411811e787335d7",
+    "status": "TAMPERED"
+  }
+}

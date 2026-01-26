@@ -46,15 +46,15 @@ const Home = () => {
         <div className="space-y-32 pb-24">
             {/* Hero Section */}
             <header className="relative pt-20 pb-16 text-center space-y-10 max-w-5xl mx-auto px-4">
-                <div className="inline-flex items-center space-x-2 bg-gray-50 border border-gray-100 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-primary">
-                    <div className="h-1.5 w-1.5 bg-secondary rounded-full animate-pulse" />
-                    <span>Blockchain Credibility: Polygon Mainnet</span>
+                <div className="inline-flex items-center space-x-2 bg-primary/5 border border-primary/10 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-primary">
+                    <div className="h-1.5 w-1.5 bg-primary rounded-full animate-pulse" />
+                    <span>Blockchain Credibility: Polygon Amoy Testnet</span>
                 </div>
 
                 <div className="space-y-6">
                     <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-[1] animate-in slide-in-from-bottom-8 duration-700">
                         Maritime <br />
-                        <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-primary via-green-600 to-primary-hover bg-clip-text text-transparent">
                             Document Management
                         </span>
                     </h1>
@@ -73,13 +73,13 @@ const Home = () => {
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-5 pt-8">
                     <Link
                         to={getCTALink()}
-                        className="w-full sm:w-auto bg-primary text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-opacity-90 transition shadow-lg active:scale-[0.98]"
+                        className="w-full sm:w-auto bg-gradient-to-r from-green-700 to-green-500 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98] text-center"
                     >
                         {getIssuanceText()}
                     </Link>
                     <Link
                         to="/verify/public"
-                        className="w-full sm:w-auto bg-white border-2 border-primary text-primary px-10 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition active:scale-[0.98]"
+                        className="w-full sm:w-auto bg-white border-2 border-primary text-primary px-10 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition-all active:scale-[0.98] text-center"
                     >
                         Verify Document
                     </Link>
@@ -88,7 +88,7 @@ const Home = () => {
 
             {/* Verification Section */}
             <section className="max-w-4xl mx-auto px-4">
-                <div className="bg-gray-900 rounded-2xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+                <div className="bg-gray-900 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden ring-1 ring-white/10">
                     <div className="absolute top-0 right-0 p-8 opacity-10">
                         <ShieldCheck className="h-32 w-32" />
                     </div>
@@ -101,12 +101,12 @@ const Home = () => {
                             <input
                                 type="text"
                                 placeholder="Enter Document ID or Reference Number"
-                                className="w-full pl-14 pr-6 py-5 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-secondary focus:bg-white/20 outline-none transition-all text-lg placeholder:text-white/30"
+                                className="w-full pl-14 pr-6 py-5 bg-white/10 border border-white/20 rounded-xl focus:ring-4 focus:ring-primary-hover/30 focus:bg-white/20 outline-none transition-all text-lg placeholder:text-white/30"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') window.location.href = `/verify/${e.currentTarget.value}`;
                                 }}
                             />
-                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-white/40 group-focus-within:text-secondary transition" />
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-white/40 group-focus-within:text-white transition" />
                         </div>
                     </div>
                 </div>
@@ -139,12 +139,12 @@ const Home = () => {
             <section className="bg-gray-50 py-24 px-4 border-y border-gray-100">
                 <div className="max-w-6xl mx-auto space-y-16">
                     <div className="text-center space-y-4">
-                        <h2 className="text-4xl font-bold text-primary">How It Works</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto">A streamlined process for maritime document security and verification.</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">How It Works</h2>
+                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg">A streamlined process for maritime document security and verification.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
+                        <div className="bg-white p-10 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
                             <div className="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold">01</div>
                             <div className="space-y-3">
                                 <h4 className="text-xl font-bold">Register Document Hash</h4>
@@ -152,7 +152,7 @@ const Home = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
+                        <div className="bg-white p-10 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
                             <div className="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold">02</div>
                             <div className="space-y-3">
                                 <h4 className="text-xl font-bold">Authorized Digital Signing</h4>
@@ -160,8 +160,8 @@ const Home = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white p-10 rounded-xl border border-gray-100 shadow-sm space-y-6">
-                            <div className="h-12 w-12 bg-secondary/10 text-secondary rounded-lg flex items-center justify-center font-bold">03</div>
+                        <div className="bg-white p-10 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
+                            <div className="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold">03</div>
                             <div className="space-y-3">
                                 <h4 className="text-xl font-bold">Instant Global Verification</h4>
                                 <p className="text-gray-500 text-sm leading-relaxed">Documents can be verified anytime, anywhere by anyone with access.</p>
@@ -207,19 +207,20 @@ const Home = () => {
             </section>
 
             {/* Call to Action Section */}
-            <section className="max-w-5xl mx-auto px-4">
-                <div className="bg-primary rounded-3xl p-12 text-center text-white space-y-10 shadow-2xl">
+            <section className="max-w-5xl mx-auto px-4 pb-20">
+                <div className="bg-white rounded-[3rem] p-12 md:p-20 text-center border border-border shadow-2xl shadow-primary/5 space-y-10 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-green-400 to-primary" />
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-bold">Ready to Modernize Maritime Documentation?</h2>
-                        <p className="text-white/70 max-w-xl mx-auto font-medium">Join the global network of maritime authorities using blockchain for secure document management.</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Ready to Modernize Maritime Documentation?</h2>
+                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg leading-relaxed">Join the global network of maritime authorities using blockchain for secure document management.</p>
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <Link to="/login" className="bg-white text-primary px-10 py-4 rounded-lg font-bold hover:bg-gray-100 transition active:scale-95 flex items-center justify-center space-x-2">
-                            <UserPlus className="h-5 w-5" />
+                    <div className="flex flex-col sm:flex-row justify-center gap-5 pt-4">
+                        <Link to="/login" className="bg-primary text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-primary-hover transition-all shadow-xl shadow-primary/20 active:scale-95 flex items-center justify-center space-x-3">
+                            <UserPlus className="h-6 w-6" />
                             <span>Register Institution</span>
                         </Link>
-                        <Link to="/login" className="bg-secondary text-white px-10 py-4 rounded-lg font-bold hover:bg-opacity-90 transition active:scale-95 flex items-center justify-center space-x-2">
-                            <LayoutDashboard className="h-5 w-5" />
+                        <Link to="/login" className="bg-white border-2 border-primary text-primary px-10 py-5 rounded-2xl font-black text-lg hover:bg-primary/5 transition-all shadow-sm active:scale-95 flex items-center justify-center space-x-3">
+                            <LayoutDashboard className="h-6 w-6" />
                             <span>Access Professional Portal</span>
                         </Link>
                     </div>

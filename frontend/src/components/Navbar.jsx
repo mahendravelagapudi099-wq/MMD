@@ -41,12 +41,12 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
                     {/* Logo Area */}
                     <Link to="/" className="flex items-center space-x-3.5 group transition-all">
-                        <div className="bg-primary/10 p-2.5 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                        <div className="bg-primary/5 p-2.5 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
                             <Anchor className="h-6 w-6 group-hover:rotate-12 transition-transform" />
                         </div>
                         <div className="flex flex-col leading-none">
@@ -61,7 +61,7 @@ const Navbar = () => {
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className={`text-sm font-bold transition-all hover:text-primary ${isActive(link.path) ? "text-primary" : "text-gray-500"
+                                className={`text-sm font-bold transition-all hover:text-primary pb-1 border-b-2 ${isActive(link.path) ? "text-primary border-primary" : "text-gray-500 border-transparent hover:border-primary/30"
                                     }`}
                             >
                                 {link.name}
@@ -78,7 +78,7 @@ const Navbar = () => {
                                 </div>
                                 <button
                                     onClick={handleLogout}
-                                    className="p-2.5 rounded-xl bg-gray-50 text-gray-500 hover:text-error hover:bg-red-50 transition-all border border-gray-100 shadow-sm"
+                                    className="p-2.5 rounded-xl bg-gray-50 text-gray-400 hover:text-error hover:bg-red-50 transition-all border border-gray-100 shadow-sm"
                                     title="Logout"
                                 >
                                     <LogOut className="h-5 w-5" />
@@ -87,7 +87,7 @@ const Navbar = () => {
                         ) : (
                             <Link
                                 to="/login"
-                                className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg shadow-blue-100 text-sm active:scale-95"
+                                className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition shadow-lg shadow-primary/10 text-sm active:scale-95"
                             >
                                 Get Started
                             </Link>
@@ -96,7 +96,7 @@ const Navbar = () => {
 
                     {/* Mobile Toggle */}
                     <button
-                        className="md:hidden p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition"
+                        className="md:hidden p-2 text-gray-500 hover:bg-gray-50 rounded-lg transition"
                         onClick={() => setIsOpen(!isOpen)}
                     >
                         {isOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
@@ -106,13 +106,13 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden absolute top-16 inset-x-0 bg-white border-b border-gray-100 shadow-xl overflow-hidden animate-in slide-in-from-top duration-300">
+                <div className="md:hidden absolute top-20 inset-x-0 bg-white border-b border-border shadow-2xl overflow-hidden animate-in slide-in-from-top duration-300">
                     <div className="p-4 space-y-2">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className={`flex items-center justify-between p-4 rounded-xl text-lg font-bold transition-all ${isActive(link.path) ? "bg-blue-50 text-primary" : "text-gray-600 hover:bg-gray-50"
+                                className={`flex items-center justify-between p-4 rounded-xl text-lg font-bold transition-all ${isActive(link.path) ? "bg-primary/5 text-primary" : "text-gray-600 hover:bg-gray-50"
                                     }`}
                                 onClick={() => setIsOpen(false)}
                             >
@@ -121,7 +121,7 @@ const Navbar = () => {
                             </Link>
                         ))}
 
-                        <div className="pt-4 mt-2 border-t border-gray-100">
+                        <div className="pt-4 mt-2 border-t border-border">
                             {user ? (
                                 <div className="space-y-4">
                                     <div className="px-4 py-2">

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { db } from "../utils/firebase";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { getTransactionStatus, getProvider, getContract, getExplorerUrl, connectWallet } from "../utils/blockchain";
+import { getActiveNetwork } from "../config/networks";
 import { hashCertificateData, formatDate } from "../utils/helpers";
 import {
     ShieldCheck,
@@ -31,6 +32,9 @@ const VerificationPage = () => {
     const { certId: urlCertId } = useParams();
     const navigate = useNavigate();
 
+    const location = useLocation();
+    const qrProof = location.state?.proof;
+
     const [certId, setCertId] = useState(urlCertId || "");
     const [searchType, setSearchType] = useState("certId"); // certId | studentId
     const [loading, setLoading] = useState(false);
@@ -40,6 +44,7 @@ const VerificationPage = () => {
     const [showReceipt, setShowReceipt] = useState(false);
     const [explorerUrl, setExplorerUrl] = useState("");
     const [walletAddress, setWalletAddress] = useState("");
+    const activeNetwork = getActiveNetwork();
 
     // Manual Form States
     const [isManualMode, setIsManualMode] = useState(false);
@@ -120,46 +125,42 @@ const VerificationPage = () => {
                 return;
             }
 
-            if (!isValid) {
-                setResult({ valid: false, reason: "REVOKED" });
-                return;
-            }
+            // Strictly integrity check: remove revocation check per request
 
-            // Step 2: Get details from DB
+            // Step 2: Get details from DB (Skip if QR proof exists)
             setStep(2);
-            const certDoc = await getDoc(doc(db, "certificates", finalCertId));
-            if (!certDoc.exists()) {
-                setResult({ valid: false, reason: "METADATA_MISSING" });
-                return;
+            let dbData = null;
+            if (qrProof) {
+                dbData = { ...qrProof, certId: finalCertId };
+                console.log("Using QR Zero-Trust Proof Data");
+            } else {
+                const certDoc = await getDoc(doc(db, "certificates", finalCertId));
+                if (!certDoc.exists()) {
+                    setResult({ valid: false, reason: "METADATA_MISSING" });
+                    return;
+                }
+                dbData = certDoc.data();
             }
-            const dbData = certDoc.data();
 
             // Step 3: Verify Hash Integrity
             setStep(3);
-            const calculatedHash = hashCertificateData({
-                studentName: dbData.studentName,
-                studentId: dbData.studentId,
-                courseName: dbData.courseName,
-                grade: dbData.grade,
-                institutionName: dbData.institutionName,
-                issueDate: dbData.issueDate,
-                email: dbData.email,
-                certId: finalCertId
-            });
+            const calculatedHash = hashCertificateData(dbData);
 
             if (calculatedHash !== certHashOnChain) {
                 setResult({ valid: false, reason: "TAMPERED" });
+                console.error("Hash Mismatch! On-chain:", certHashOnChain, "Calculated:", calculatedHash);
                 return;
             }
 
             // Success
             setResult({
                 valid: true,
+                isQrProof: !!qrProof,
                 data: dbData,
                 chain: {
                     hash: certHashOnChain,
-                    txHash: dbData.txHash,
-                    blockNumber: dbData.blockNumber,
+                    txHash: dbData.txHash || "0x...",
+                    blockNumber: dbData.blockNumber || 0,
                     timestamp: dbData.timestamp?.toDate() || new Date(dbData.issueDate)
                 }
             });
@@ -282,6 +283,8 @@ const VerificationPage = () => {
                         setResult={setResult}
                         generateReport={generateReport}
                         setShowReceipt={setShowReceipt}
+                        handleVerify={handleVerify}
+                        explorerUrl={explorerUrl}
                     /> :
                     <InvalidResult
                         result={result}
@@ -291,6 +294,7 @@ const VerificationPage = () => {
                         certId={certId}
                     />) :
                     <SearchState
+                        activeNetwork={activeNetwork}
                         isManualMode={isManualMode}
                         setIsManualMode={setIsManualMode}
                         searchType={searchType}
@@ -341,7 +345,7 @@ const VerificationPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
                             <ReceiptRow label="Transaction Hash" value={result.chain.txHash} mono />
                             <ReceiptRow label="Block Number" value={`#${result.chain.blockNumber}`} />
-                            <ReceiptRow label="Network Status" value="Confirmed (Local)" status="success" />
+                            <ReceiptRow label="Network Status" value={`Confirmed (${activeNetwork.label})`} status="success" />
                             <ReceiptRow label="Verification Date" value={new Date().toLocaleString()} />
                         </div>
 
@@ -378,6 +382,7 @@ const VerificationPage = () => {
 };
 
 const SearchState = ({
+    activeNetwork,
     isManualMode,
     setIsManualMode,
     searchType,
@@ -393,17 +398,22 @@ const SearchState = ({
 }) => (
     <div className="max-w-2xl mx-auto space-y-12 py-12 px-4">
         <div className="text-center space-y-4">
-            <div className="h-24 w-24 bg-blue-50 text-primary rounded-[2.5rem] flex items-center justify-center mx-auto shadow-inner">
+            <div className="h-24 w-24 bg-primary/10 text-primary rounded-[2.5rem] flex items-center justify-center mx-auto shadow-inner">
                 <ShieldCheck className="h-12 w-12" />
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Public Registry</h1>
-            <p className="text-gray-500 font-medium text-base md:text-lg">Instant cryptographic verification of MDM credentials.</p>
+            <div className="flex items-center justify-center gap-2 mt-1">
+                <p className="text-text-secondary font-medium text-base md:text-lg">Instant cryptographic verification of MDM credentials.</p>
+                <span className={`px-2 py-0.5 ${activeNetwork.badgeColor} text-white text-[9px] font-black rounded-lg uppercase tracking-widest`}>
+                    {activeNetwork.label}
+                </span>
+            </div>
 
             {!walletAddress && (
                 <div className="mt-4 animate-in fade-in slide-in-from-top-4">
                     <button
                         onClick={handleConnect}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-black text-xs hover:bg-blue-600 transition shadow-lg shadow-blue-100 active:scale-95"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-black text-xs hover:bg-primary-hover transition shadow-lg shadow-primary/10 active:scale-95"
                     >
                         <Zap className="h-3 w-3 fill-white" />
                         Connect MetaMask to Verify
@@ -413,7 +423,7 @@ const SearchState = ({
             )}
         </div>
 
-        <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-gray-100 space-y-8">
+        <div className="bg-white p-10 rounded-[3rem] shadow-2xl shadow-primary/5 border border-border space-y-8">
             <div className="flex bg-gray-50 p-1.5 rounded-2xl relative items-center gap-1.5">
                 <button
                     onClick={() => setIsManualMode(false)}
@@ -456,7 +466,7 @@ const SearchState = ({
                                 autoFocus
                                 type="text"
                                 placeholder={searchType === "certId" ? "CERT-2024..." : "MRG-2025..."}
-                                className="w-full pl-16 pr-6 py-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-blue-100 transition-all outline-none text-lg font-bold tracking-tight"
+                                className="w-full pl-16 pr-6 py-5 bg-gray-50 border-2 border-border rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary-hover/20 transition-all outline-none text-lg font-bold tracking-tight"
                                 value={certId}
                                 onChange={(e) => setCertId(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
@@ -465,7 +475,7 @@ const SearchState = ({
                     </div>
                     <button
                         onClick={() => handleVerify()}
-                        className="w-full bg-primary text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-600 transition shadow-xl shadow-blue-100 flex items-center justify-center space-x-3 active:scale-95"
+                        className="w-full bg-primary text-white py-5 rounded-2xl font-black text-xl hover:bg-primary-hover transition shadow-xl shadow-primary/10 flex items-center justify-center space-x-3 active:scale-95"
                     >
                         <span>Verify {searchType === "certId" ? "ID" : "Student"}</span>
                     </button>
@@ -483,7 +493,7 @@ const SearchState = ({
                     </div>
                     <button
                         onClick={handleManualVerify}
-                        className="w-full bg-primary text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-600 transition shadow-xl shadow-blue-100 flex items-center justify-center space-x-3 active:scale-95 mt-4"
+                        className="w-full bg-primary text-white py-5 rounded-2xl font-black text-xl hover:bg-primary-hover transition shadow-xl shadow-primary/10 flex items-center justify-center space-x-3 active:scale-95 mt-4"
                     >
                         <Zap className="h-6 w-6 fill-white" />
                         <span>Run Security Check</span>
@@ -537,19 +547,24 @@ const StepItem = ({ label, active, done }) => (
     </div>
 );
 
-const ValidResult = ({ result, setResult, generateReport, setShowReceipt }) => (
+const ValidResult = ({ result, setResult, generateReport, setShowReceipt, handleVerify, explorerUrl }) => (
     <div className="max-w-4xl mx-auto py-12 px-4 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {/* Status Banner */}
-        <div className="bg-success/5 border-2 border-success/20 p-8 rounded-[3rem] flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-            <div className="h-20 w-20 bg-success text-white rounded-[2rem] flex items-center justify-center shadow-lg shadow-green-100">
+        <div className="bg-white border-2 border-border p-8 rounded-[3rem] shadow-xl shadow-primary/5 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+            <div className="h-20 w-20 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center">
                 <CheckCircle2 className="h-10 w-10" />
             </div>
             <div className="flex-1 space-y-1">
                 <h2 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-                    Status: VERIFIED
+                    Status: VERIFIED (REAL)
                     <span className="text-success text-3xl">✅</span>
                 </h2>
-                <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Certificate: <span className="text-success">AUTHENTIC</span></p>
+                <div className="flex items-center gap-3">
+                    <p className="text-text-secondary font-bold uppercase tracking-widest text-xs">Certificate: <span className="text-success font-black">AUTHENTIC</span></p>
+                    {result.isQrProof && (
+                        <span className="px-2 py-0.5 bg-blue-50 text-primary text-[8px] font-black rounded border border-blue-100 uppercase tracking-tighter">Verified by QR Proof</span>
+                    )}
+                </div>
             </div>
             <button
                 onClick={() => setResult(null)}
@@ -616,19 +631,39 @@ const ValidResult = ({ result, setResult, generateReport, setShowReceipt }) => (
                     </div>
                 </div>
 
-                <div className="pt-4 flex gap-4 relative">
+                <div className="grid grid-cols-2 gap-4 pt-4 relative">
                     <button
-                        onClick={() => setShowReceipt(true)}
-                        className="flex-1 bg-white text-gray-900 py-4 rounded-2xl font-black text-xs text-center hover:bg-gray-100 transition flex items-center justify-center gap-2 shadow-xl shadow-black/20"
+                        onClick={() => {
+                            if (explorerUrl && !explorerUrl.includes('local-proof')) {
+                                window.open(explorerUrl, "_blank");
+                            } else {
+                                alert("Explorer not available for local proof.");
+                            }
+                        }}
+                        className="bg-white text-gray-900 py-3.5 rounded-2xl font-black text-[10px] text-center hover:bg-gray-100 transition flex items-center justify-center gap-2 shadow-xl shadow-black/20"
                     >
-                        <History className="h-4 w-4" />
-                        Internal Receipt
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        External Explorer
                     </button>
                     <button
-                        onClick={generateReport}
-                        className="flex-1 bg-primary text-white py-4 rounded-2xl font-black text-xs text-center hover:bg-blue-600 transition flex items-center justify-center gap-2"
+                        onClick={() => handleVerify(result.data.certId)}
+                        className="bg-white/10 border border-white/20 text-white py-3.5 rounded-2xl font-black text-[10px] text-center hover:bg-white/20 transition flex items-center justify-center gap-2"
                     >
-                        <Printer className="h-4 w-4" />
+                        <Zap className="h-3.5 w-3.5" />
+                        Internal
+                    </button>
+                    <button
+                        onClick={() => setShowReceipt(true)}
+                        className="bg-white/10 border border-white/20 text-white py-3.5 rounded-2xl font-black text-[10px] text-center hover:bg-white/20 transition flex items-center justify-center gap-2"
+                    >
+                        <History className="h-3.5 w-3.5" />
+                        Receipt
+                    </button>
+                    <button
+                        onClick={() => alert("Reporting feature coming soon!")}
+                        className="bg-white/5 border border-white/10 text-gray-500 py-3.5 rounded-2xl font-black text-[10px] text-center cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        <Printer className="h-3.5 w-3.5 opacity-30" />
                         Get Report
                     </button>
                 </div>
@@ -647,8 +682,8 @@ const ValidResult = ({ result, setResult, generateReport, setShowReceipt }) => (
                 </div>
 
                 <div className="space-y-4 text-center">
-                    <h1 className="text-4xl font-black text-gray-900">Certificate Status: VALID</h1>
-                    <p className="text-success font-bold">Cryptographically Verified on Polygon Blockchain</p>
+                    <h1 className="text-4xl font-black text-gray-900">Certificate Status: VERIFIED (REAL)</h1>
+                    <p className="text-success font-bold">Cryptographically Authentic Proof on Polygon</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-10 border-t border-b border-gray-100 py-10">
@@ -684,11 +719,12 @@ const InvalidResult = ({ result, setResult, setMismatchInfo, mismatchInfo, certI
                 <AlertCircle className="h-10 w-10" />
             </div>
             <div className="flex-1 space-y-1">
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight">
-                    {result.reason === "TAMPERED" ? "FAKE DETECTED" : "Verification Failed"}
+                <h2 className="text-4xl font-black text-red-600 tracking-tight">
+                    {result.reason === "TAMPERED" ? "TAMPERED (FAKE)" : "Verification Error"}
                 </h2>
-                <p className="text-error font-bold">
-                    {result.reason === "TAMPERED" ? "Security Alert: Data mismatch with blockchain record." : "We couldn't validate this credential."}
+                <p className="text-red-500 font-bold">
+                    {result.reason === "TAMPERED" ? "Integrity check failed. Digital signatures do not match the blockchain record." :
+                        "We couldn't validate this credential."}
                 </p>
             </div>
             <button
@@ -784,7 +820,7 @@ const ManualInput = ({ label, placeholder, value, onChange }) => (
         <input
             type="text"
             placeholder={placeholder}
-            className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-blue-100 transition-all outline-none text-sm font-bold"
+            className="w-full px-5 py-3.5 bg-gray-50 border border-border rounded-xl focus:bg-white focus:ring-4 focus:ring-primary-hover/20 transition-all outline-none text-sm font-bold"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         />

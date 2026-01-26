@@ -4,20 +4,32 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
+@theme {
+  --color-primary: #2E7D32;
+  --color-primary-hover: #388E3C;
+  --color-bg: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-text-main: #1A1C1E;
+  --color-text-secondary: #42474E;
+  --color-border: #F0F0F0;
+  --color-success: #2ECC71;
+  --color-warning: #FBC02D;
+  --color-error: #E53935;
+}
+
 body {
   margin: 0;
   min-width: 320px;
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
 }
 
 #root {
   width: 100%;
 }
 
-@theme {
-  --color-primary: #003366;
-  /* Navy Blue */
-  --color-secondary: #008080;
-  /* Teal */
-  --color-success: #10B981;
-  --color-error: #EF4444;
+@layer base {
+  *:focus {
+    @apply ring-2 ring-primary-hover outline-none;
+  }
 }
