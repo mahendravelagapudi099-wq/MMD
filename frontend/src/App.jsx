@@ -67,11 +67,11 @@ function App() {
                 <Anchor className="h-8 w-8" />
                 <span className="font-black tracking-tighter text-3xl text-primary">MDM</span>
               </div>
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Maritime Document Management</span>
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Marit Document Management</span>
             </div>
 
             <div className="text-center text-gray-500 text-sm max-w-lg space-y-6">
-              <p className="leading-relaxed">Decentralized maritime document verification and issuance platform, ensuring global document integrity on the blockchain.</p>
+              <p className="leading-relaxed">Decentralized marit document verification and issuance platform, ensuring global document integrity on the blockchain.</p>
 
               <div className="flex flex-col space-y-3">
                 <div className="inline-flex items-center justify-center space-x-2 px-4 py-1.5 bg-gray-50 rounded-full">

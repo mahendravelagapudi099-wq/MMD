@@ -53,7 +53,7 @@ const Home = () => {
 
                 <div className="space-y-6">
                     <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-[1] animate-in slide-in-from-bottom-8 duration-700">
-                        Maritime <br />
+                        Marit <br />
                         <span className="bg-gradient-to-r from-primary via-green-600 to-primary-hover bg-clip-text text-transparent">
                             Document Management
                         </span>
@@ -66,7 +66,7 @@ const Home = () => {
                         <span>Compliant</span>
                     </div>
                     <p className="text-xl md:text-2xl text-gray-500 leading-relaxed max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-4 delay-700">
-                        The gold standard in maritime verification. MDM provides a bulletproof, blockchain-anchored ledger for managing global maritime credentials.
+                        The gold standard in marit verification. MDM provides a bulletproof, blockchain-anchored ledger for managing global marit credentials.
                     </p>
                 </div>
 
@@ -114,7 +114,7 @@ const Home = () => {
 
             {/* Trusted By Section */}
             <section className="max-w-6xl mx-auto px-4 text-center space-y-12">
-                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-400">Trusted by Maritime Authorities & Institutions</h3>
+                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-400">Trusted by Marit Authorities & Institutions</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center opacity-60">
                     <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
                         <Anchor className="h-10 w-10 text-primary" />
@@ -122,7 +122,7 @@ const Home = () => {
                     </div>
                     <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
                         <Globe className="h-10 w-10 text-primary" />
-                        <span className="font-bold text-sm">Maritime Training Institutes</span>
+                        <span className="font-bold text-sm">Marit Training Institutes</span>
                     </div>
                     <div className="flex flex-col items-center space-y-3 grayscale hover:grayscale-0 transition cursor-default">
                         <FileCheck className="h-10 w-10 text-primary" />
@@ -140,7 +140,7 @@ const Home = () => {
                 <div className="max-w-6xl mx-auto space-y-16">
                     <div className="text-center space-y-4">
                         <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">How It Works</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg">A streamlined process for maritime document security and verification.</p>
+                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg">A streamlined process for marit document security and verification.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -189,7 +189,7 @@ const Home = () => {
                             <Globe className="h-6 w-6" />
                         </div>
                         <div className="space-y-3">
-                            <h4 className="text-xl font-bold">Global Maritime Interoperability</h4>
+                            <h4 className="text-xl font-bold">Global Marit Interoperability</h4>
                             <p className="text-gray-500 text-sm leading-relaxed">Built on open blockchain standards for seamless cross-border verification.</p>
                         </div>
                     </div>
@@ -211,8 +211,8 @@ const Home = () => {
                 <div className="bg-white rounded-[3rem] p-12 md:p-20 text-center border border-border shadow-2xl shadow-primary/5 space-y-10 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-green-400 to-primary" />
                     <div className="space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Ready to Modernize Maritime Documentation?</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg leading-relaxed">Join the global network of maritime authorities using blockchain for secure document management.</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Ready to Modernize Marit Documentation?</h2>
+                        <p className="text-gray-500 max-w-xl mx-auto font-medium text-lg leading-relaxed">Join the global network of marit authorities using blockchain for secure document management.</p>
                     </div>
                     <div className="flex flex-col sm:flex-row justify-center gap-5 pt-4">
                         <Link to="/login" className="bg-primary text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-primary-hover transition-all shadow-xl shadow-primary/20 active:scale-95 flex items-center justify-center space-x-3">

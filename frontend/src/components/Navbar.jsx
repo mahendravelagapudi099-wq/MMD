@@ -51,7 +51,7 @@ const Navbar = () => {
                         </div>
                         <div className="flex flex-col leading-none">
                             <span className="text-2xl font-black text-gray-900 tracking-tighter">MDM<span className="text-primary italic">.</span></span>
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-primary transition-colors">Maritime Systems</span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-primary transition-colors">Marit Systems</span>
                         </div>
                     </Link>
 

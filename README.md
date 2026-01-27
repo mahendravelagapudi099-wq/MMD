@@ -1,4 +1,4 @@
-# MDM - Maritime Document Management Platform ⚓
+# MDM - Marit Document Management Platform ⚓
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Blockchain: Polygon Amoy](https://img.shields.io/badge/Blockchain-Polygon%20Amoy-8247E5)](https://polygon.technology/)
