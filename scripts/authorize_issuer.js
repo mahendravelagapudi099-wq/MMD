@@ -13,6 +13,7 @@ async function main() {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const wallet = new ethers.Wallet(privateKey, provider);
 
+    // const contractAddress = require("../frontend/src/utils/contractAddress.json").address;
     const contractAddress = "0x84050B0C256be4b98d06DC4dd7737e66680BBF91";
     const abi = [
         "function addIssuer(address _issuer) external",
@@ -22,9 +23,10 @@ async function main() {
 
     const contract = new ethers.Contract(contractAddress, abi, wallet);
 
-    const targetAddress = process.argv[2];
-    if (!targetAddress || !ethers.isAddress(targetAddress)) {
-        console.error("Usage: node scripts/authorize_issuer.js <TARGET_ADDRESS>");
+    const targetAddress = process.argv[2] || wallet.address;
+
+    if (!ethers.isAddress(targetAddress)) {
+        console.error("Invalid target address provided.");
         process.exit(1);
     }
 

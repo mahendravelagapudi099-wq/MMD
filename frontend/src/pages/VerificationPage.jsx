@@ -4,7 +4,7 @@ import { db } from "../utils/firebase";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { getTransactionStatus, getProvider, getContract, getExplorerUrl, connectWallet } from "../utils/blockchain";
 import { getActiveNetwork } from "../config/networks";
-import { hashCertificateData, formatDate } from "../utils/helpers";
+import { hashCertificateData, formatDate, verifyDigitalSignature } from "../utils/helpers";
 import {
     ShieldCheck,
     Search,
@@ -152,10 +152,39 @@ const VerificationPage = () => {
                 return;
             }
 
+
+
+            // --- ADDITIVE: Signature Verification ---
+            let isIssuerMismatch = false;
+            let signatureValid = false;
+
+            try {
+                if (dbData.digitalSignature) {
+                    console.log("Verifying Digital Signature...");
+                    const keyRes = await fetch("http://localhost:5000/api/auth/public-key");
+                    if (keyRes.ok) {
+                        const { publicKey } = await keyRes.json();
+                        signatureValid = await verifyDigitalSignature(certHashOnChain, dbData.digitalSignature, publicKey);
+
+                        if (!signatureValid) {
+                            console.warn("Digital Signature Invalid! Issuer Mismatch Detected.");
+                            isIssuerMismatch = true;
+                        } else {
+                            console.log("Digital Signature Verified.");
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Signature verification skipped:", err);
+            }
+            // ----------------------------------------
+
             // Success
             setResult({
                 valid: true,
                 isQrProof: !!qrProof,
+                isIssuerMismatch, // Pass flag to UI
+                signatureValid,   // Pass flag to UI
                 data: dbData,
                 chain: {
                     hash: certHashOnChain,

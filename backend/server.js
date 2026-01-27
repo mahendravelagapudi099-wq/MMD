@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const certificateService = require('./services/certificateService');
 const ipfsService = require('./services/ipfsService');
+const signatureService = require('./services/signatureService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,6 +13,39 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// --- NEW: Digital Signature Side-Car Endpoints ---
+
+/**
+ * Get the Institution's Public Key
+ */
+app.get('/api/auth/public-key', (req, res) => {
+    try {
+        const publicKey = signatureService.getPublicKey();
+        res.json({ publicKey });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve public key' });
+    }
+});
+
+/**
+ * Sign a Certificate Hash
+ */
+app.post('/api/auth/sign', (req, res) => {
+    try {
+        const { hash } = req.body;
+        if (!hash) {
+            return res.status(400).json({ error: 'Hash is required' });
+        }
+        const signature = signatureService.sign(hash);
+        res.json({ signature });
+    } catch (error) {
+        console.error("Signing Error:", error);
+        res.status(500).json({ error: 'Signing failed' });
+    }
+});
+
+// --------------------------------------------------
 
 // Basic health check
 app.get('/health', (req, res) => {
@@ -47,6 +81,7 @@ app.post('/api/certificates/generate-pdf', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 /**
  * Endpoint to generate a PDF and upload it to IPFS

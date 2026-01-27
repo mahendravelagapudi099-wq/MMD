@@ -419,6 +419,34 @@ const InstitutionDashboard = () => {
                 status: "confirmed"
             };
 
+            // --- ADDITIVE: Digital Signature Side-Car ---
+            try {
+                console.log("Requesting Digital Signature...");
+                const signRes = await fetch('http://localhost:5000/api/auth/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hash: certHash })
+                });
+
+                if (signRes.ok) {
+                    const signData = await signRes.json();
+                    console.log("Signature Response:", signData);
+                    if (signData.signature) {
+                        finalCertData.digitalSignature = signData.signature;
+                        console.log("Digital Signature added successfully.");
+                    } else {
+                        console.warn("Signature response missing 'signature' field");
+                    }
+                } else {
+                    console.warn(`Signature Service Error: ${signRes.status} ${signRes.statusText}`);
+                    const errorText = await signRes.text();
+                    console.warn("Error Details:", errorText);
+                }
+            } catch (err) {
+                console.error("Signature generation EXCEPTION:", err);
+            }
+            // ---------------------------------------------
+
             await setDoc(doc(db, "certificates", certId), finalCertData);
 
             setSuccessData(finalCertData);
@@ -473,13 +501,15 @@ const InstitutionDashboard = () => {
                 useCORS: true,
                 backgroundColor: "#ffffff"
             });
-            const imgData = canvas.toDataURL("image/png");
+            const imgData = canvas.toDataURL("image/jpeg", 0.95);
+            console.log("PDF generation: Image data length:", imgData.length);
+
             const pdf = new jsPDF("l", "mm", "a4");
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+            pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
             pdf.save(`Certificate_${data.certId}.pdf`);
         } catch (err) {
             console.error("PDF generation failed:", err);
@@ -769,6 +799,7 @@ const InstitutionDashboard = () => {
                 {/* Registry Explorer & Mini Explorer */}
                 <section className="lg:col-span-2 space-y-8">
                     {/* Mini Explorer Card */}
+                    {/* 
                     <div className="bg-gray-900 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden text-white border border-white/5 hover:shadow-primary/5 transition-all duration-300">
                         <div className="absolute top-0 right-0 p-8 opacity-5">
                             <History className="h-24 w-24" />
@@ -835,9 +866,11 @@ const InstitutionDashboard = () => {
                             )}
                         </div>
                     </div>
+                     */}
 
                     <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-border space-y-6 hover:shadow-md transition-all duration-300">
                         {/* Tab Switcher */}
+                        {/* 
                         <div className="flex bg-gray-50 p-1 rounded-2xl w-fit">
                             <button
                                 onClick={() => setActiveTab("registry")}
@@ -852,6 +885,7 @@ const InstitutionDashboard = () => {
                                 Student Records
                             </button>
                         </div>
+                         */}
 
                         {activeTab === "registry" ? (
                             <>
@@ -947,9 +981,20 @@ const InstitutionDashboard = () => {
                                                                     <FileText className="h-4 w-4" />
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => generatePDF(cert)}
+                                                                    onClick={() => {
+                                                                        if (cert.ipfsHash) {
+                                                                            // Direct Download from IPFS
+                                                                            const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${cert.ipfsHash}?filename=Certificate_${cert.certId}.pdf`;
+                                                                            window.open(ipfsUrl, "_blank");
+                                                                        } else if (cert.gatewayUrl) {
+                                                                            window.open(cert.gatewayUrl, "_blank");
+                                                                        } else {
+                                                                            setError("IPFS Hash not found for this certificate.");
+                                                                            setTimeout(() => setError(""), 5000);
+                                                                        }
+                                                                    }}
                                                                     className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-lg transition-all"
-                                                                    title="Download Local PDF"
+                                                                    title="Download stored PDF from IPFS"
                                                                 >
                                                                     <Download className="h-4 w-4" />
                                                                 </button>
@@ -1286,53 +1331,58 @@ const InstitutionDashboard = () => {
                     </div>
                 )}
                 {/* Hidden Certificate Template for PDF Generation */}
-                <div className="hidden">
+                <div className="absolute top-[-9999px] left-[-9999px] opacity-0 pointer-events-none">
                     <div
                         ref={certificateRef}
-                        className="w-[1000px] p-20 bg-white border-[20px] border-blue-50 flex flex-col items-center text-center space-y-10 font-sans"
+                        className="w-[1000px] p-20 bg-white border-[20px] flex flex-col items-center text-center space-y-10 font-sans"
+                        style={{
+                            borderColor: "#eff6ff", // border-blue-50
+                            color: "#111827"        // text-gray-900 default
+                        }}
                     >
                         <div className="w-full flex justify-between items-start">
-                            <ShieldCheck className="h-16 w-16 text-primary" />
+                            {/* SVG Icon handling: Ensure safe color */}
+                            <ShieldCheck className="h-16 w-16" style={{ color: "#2E7D32" }} />
                             <div className="text-right">
-                                <p className="text-sm font-bold text-gray-300 tracking-widest uppercase">Official Record</p>
-                                <p className="text-xs font-mono text-gray-400">{successData?.certId || "CERT-XXXX-XXXX"}</p>
+                                <p className="text-sm font-bold tracking-widest uppercase" style={{ color: "#d1d5db" }}>Official Record</p>
+                                <p className="text-xs font-mono" style={{ color: "#9ca3af" }}>{successData?.certId || "CERT-XXXX-XXXX"}</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            <h1 className="text-6xl font-black text-gray-900 tracking-tighter">Certificate of Completion</h1>
-                            <div className="h-1.5 w-40 bg-primary mx-auto rounded-full" />
+                            <h1 className="text-6xl font-black tracking-tighter" style={{ color: "#111827" }}>Certificate of Completion</h1>
+                            <div className="h-1.5 w-40 mx-auto rounded-full" style={{ backgroundColor: "#2E7D32" }} />
                         </div>
 
                         <div className="space-y-6">
-                            <p className="text-xl text-gray-400 font-medium italic">This is to certify that</p>
-                            <h2 className="text-5xl font-black text-primary">{successData?.studentName || "Student Name"}</h2>
-                            <p className="text-xl text-gray-400 font-medium max-w-2xl mx-auto">
+                            <p className="text-xl font-medium italic" style={{ color: "#9ca3af" }}>This is to certify that</p>
+                            <h2 className="text-5xl font-black" style={{ color: "#2E7D32" }}>{successData?.studentName || "Student Name"}</h2>
+                            <p className="text-xl font-medium max-w-2xl mx-auto" style={{ color: "#9ca3af" }}>
                                 has successfully completed the requirements for the course
                             </p>
-                            <h3 className="text-3xl font-bold text-gray-900">{successData?.courseName || "Course Name"}</h3>
+                            <h3 className="text-3xl font-bold" style={{ color: "#111827" }}>{successData?.courseName || "Course Name"}</h3>
                             <div className="flex justify-center gap-12 pt-4">
                                 <div className="text-center">
-                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Grade</p>
-                                    <p className="text-lg font-bold text-gray-900">{successData?.grade || "Grade"}</p>
+                                    <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: "#d1d5db" }}>Grade</p>
+                                    <p className="text-lg font-bold" style={{ color: "#111827" }}>{successData?.grade || "Grade"}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Institution</p>
-                                    <p className="text-lg font-bold text-gray-900">{successData?.institutionName || "Institution"}</p>
+                                    <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: "#d1d5db" }}>Institution</p>
+                                    <p className="text-lg font-bold" style={{ color: "#111827" }}>{successData?.institutionName || "Institution"}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Issue Date</p>
-                                    <p className="text-lg font-bold text-gray-900">{formatDate(successData?.issueDate) || "Date"}</p>
+                                    <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: "#d1d5db" }}>Issue Date</p>
+                                    <p className="text-lg font-bold" style={{ color: "#111827" }}>{formatDate(successData?.issueDate) || "Date"}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center space-y-4 pt-10 border-t border-gray-50 w-full opacity-60">
+                        <div className="flex flex-col items-center space-y-4 pt-10 border-t w-full opacity-60" style={{ borderColor: "#f9fafb" }}>
                             <QRCodeSVG
                                 value={`${window.location.origin}/verify/${successData?.certId || "CERT-XXXX-XXXX"}`}
                                 size={80}
                             />
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: "#9ca3af" }}>
                                 VERIFIED ON POLYGON BLOCKCHAIN • #{successData?.txHash?.slice(0, 12) || "0x..."}
                             </p>
                         </div>

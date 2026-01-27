@@ -27,11 +27,13 @@ import {
     AlertCircle,
     Shapes,
     Loader2,
-    CheckCircle2
+    CheckCircle2,
+    ChevronDown,
+    ChevronUp
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+// import { jsPDF } from "jspdf";
+// import html2canvas from "html2canvas";
 
 const StudentPortal = () => {
     const [certificates, setCertificates] = useState([]);
@@ -40,6 +42,7 @@ const StudentPortal = () => {
     const [selectedCert, setSelectedCert] = useState(null);
     const [copyStatus, setCopyStatus] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     const certificateRef = useRef(null);
 
@@ -109,27 +112,15 @@ const StudentPortal = () => {
         img.src = "data:image/svg+xml;base64," + btoa(svgData);
     };
 
-    const generatePDF = async () => {
-        if (!certificateRef.current) return;
-        setDownloading(true);
-        try {
-            const canvas = await html2canvas(certificateRef.current, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            });
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("l", "mm", "a4");
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`Certificate_${selectedCert.certId}.pdf`);
-        } catch (err) {
-            console.error("PDF generation failed:", err);
-        } finally {
-            setDownloading(false);
+    // --- Actions ---
+    const handleDownloadPDF = (cert) => {
+        if (cert?.ipfsHash) {
+            const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${cert.ipfsHash}?filename=Certificate_${cert.certId}.pdf`;
+            window.open(ipfsUrl, "_blank");
+        } else if (cert?.gatewayUrl) {
+            window.open(cert.gatewayUrl, "_blank");
+        } else {
+            alert("PDF not found for this certificate.");
         }
     };
 
@@ -282,7 +273,7 @@ const StudentPortal = () => {
                                             <span>Details</span>
                                         </button>
                                         <button
-                                            onClick={() => setSelectedCert(cert)} // Simplified for demo, opens modal which has PDF
+                                            onClick={() => handleDownloadPDF(cert)}
                                             className="flex items-center justify-center space-x-2 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-black hover:bg-gray-200 transition active:scale-95"
                                         >
                                             <Download className="h-4 w-4" />
@@ -309,9 +300,9 @@ const StudentPortal = () => {
                         </button>
 
                         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
-                            {/* Left Column: QR & Meta */}
-                            <div className="md:col-span-2 bg-gray-50/50 p-6 md:p-10 flex flex-col items-center justify-center space-y-8 border-b md:border-b-0 md:border-r border-gray-100">
-                                <div className="relative group">
+                            {/* Left Column: Visuals & trust */}
+                            <div className="md:col-span-2 bg-gray-50/50 p-6 md:p-10 flex flex-col items-center justify-start space-y-8 border-b md:border-b-0 md:border-r border-gray-100">
+                                <div className="relative group mt-8">
                                     <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] blur-2xl group-hover:bg-primary/20 transition duration-700" />
                                     <div className="relative bg-white p-5 rounded-[2.5rem] shadow-xl border-4 border-white shadow-blue-100/50">
                                         <QRCodeSVG
@@ -325,139 +316,118 @@ const StudentPortal = () => {
                                     </div>
                                 </div>
 
-                                <div className="text-center space-y-4 w-full">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Registry Reference</label>
-                                        <div className="flex items-center justify-center space-x-2 bg-white px-4 py-2 rounded-xl border border-gray-100 mt-1">
-                                            <span className="font-mono text-xs font-black text-primary truncate max-w-[120px]">{selectedCert.certId}</span>
-                                            <button onClick={() => handleCopyLink(selectedCert.certId)} className="text-gray-400 hover:text-primary transition">
-                                                {copyStatus ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                                            </button>
-                                        </div>
+                                <div className="text-center w-full">
+                                    <div className="bg-green-100/50 text-success px-4 py-2 rounded-xl inline-flex items-center gap-2 mb-2">
+                                        <CheckCircle2 className="h-4 w-4 fill-green-500 text-white" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Trust Verified</span>
                                     </div>
-
-                                    <div className="pt-4 grid grid-cols-1 gap-3">
-                                        <button
-                                            onClick={() => downloadQR(selectedCert.certId)}
-                                            className="w-full py-3 px-4 bg-white border-2 border-gray-100 rounded-xl text-xs font-black text-gray-700 hover:border-primary hover:text-primary transition flex items-center justify-center space-x-2"
-                                        >
-                                            <QrCode className="h-4 w-4" />
-                                            <span>Download QR as PNG</span>
-                                        </button>
-                                        <a
-                                            href={`https://amoy.polygonscan.com/tx/${selectedCert.txHash}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full py-3 px-4 bg-blue-50 text-primary rounded-xl text-xs font-black hover:bg-blue-100 transition flex items-center justify-center space-x-2"
-                                        >
-                                            <ShieldCheck className="h-4 w-4" />
-                                            <span>View Blockchain Proof</span>
-                                        </a>
-                                    </div>
+                                    <p className="text-xs text-gray-400 font-medium max-w-[200px] mx-auto leading-relaxed">
+                                        This document is cryptographically verified on the Polygon Amoy blockchain.
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Right Column: Actions & Preview */}
-                            <div className="md:col-span-3 p-6 md:p-10 space-y-10">
+                            {/* Right Column: Details & Actions */}
+                            <div className="md:col-span-3 p-6 md:p-10 space-y-8">
                                 <div className="space-y-6">
                                     <header>
-                                        <h2 className="text-3xl font-black text-gray-900 tracking-tight">{selectedCert.courseName}</h2>
-                                        <p className="text-gray-500 font-medium">Issued by {selectedCert.institutionName || `Institution #${selectedCert.issuerId.slice(-4)}`}</p>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="h-8 w-8 bg-blue-50 text-primary rounded-lg flex items-center justify-center">
+                                                <Award className="h-4 w-4" />
+                                            </div>
+                                            <span className="text-sm font-bold text-primary">Certified Achievement</span>
+                                        </div>
+                                        <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">{selectedCert.courseName}</h2>
+                                        <p className="text-gray-500 font-medium text-lg mt-2">Issued by <span className="text-gray-900 font-semibold">{selectedCert.institutionName || `Institution #${selectedCert.issuerId.slice(-4)}`}</span></p>
                                     </header>
 
-                                    <div className="grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-3xl">
+                                    <div className="grid grid-cols-2 gap-4 bg-gray-50 p-5 rounded-3xl border border-gray-100">
                                         <div>
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Student Name</span>
-                                            <p className="font-bold text-gray-900">{selectedCert.studentName}</p>
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Student</span>
+                                            <p className="font-bold text-gray-900 text-lg">{selectedCert.studentName}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Grade Achieved</span>
-                                            <p className="font-bold text-primary">{selectedCert.grade}</p>
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Grade</span>
+                                            <p className="font-bold text-primary text-lg">{selectedCert.grade}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Share This Merit</h4>
-                                    <div className="flex flex-wrap gap-4">
-                                        <button onClick={() => shareSocial('linkedin', selectedCert)} className="h-14 w-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition shadow-lg shadow-blue-200">
-                                            <Linkedin className="h-6 w-6" />
-                                        </button>
-                                        <button onClick={() => shareSocial('whatsapp', selectedCert)} className="h-14 w-14 bg-green-500 text-white rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition shadow-lg shadow-green-200">
-                                            <MessageCircle className="h-6 w-6" />
-                                        </button>
-                                        <button onClick={() => shareSocial('email', selectedCert)} className="h-14 w-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition shadow-lg shadow-gray-200">
-                                            <Mail className="h-6 w-6" />
-                                        </button>
-                                        <button onClick={() => handleCopyLink(selectedCert.certId)} className="h-14 w-14 bg-white border-2 border-gray-100 text-gray-900 rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition shadow-md">
-                                            <Copy className="h-6 w-6" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="pt-6 border-t border-gray-50 space-y-4">
+                                {/* Primary Action */}
+                                <div className="pt-2">
                                     <button
-                                        onClick={generatePDF}
-                                        disabled={downloading}
-                                        className="w-full py-5 bg-primary text-white rounded-[1.8rem] font-black text-lg hover:bg-blue-600 transition shadow-xl shadow-blue-100 flex items-center justify-center space-x-3 disabled:opacity-50"
+                                        onClick={() => handleDownloadPDF(selectedCert)}
+                                        className="w-full py-4 bg-primary text-white rounded-[1.5rem] font-bold text-lg hover:bg-blue-600 transition shadow-lg shadow-blue-100/50 flex items-center justify-center space-x-3 active:scale-95 group"
                                     >
-                                        {downloading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Download className="h-6 w-6" />}
-                                        <span>{downloading ? "Formatting Certificate..." : "Download Official PDF"}</span>
+                                        <Download className="h-5 w-5 group-hover:animate-bounce" />
+                                        <span>Download Official PDF</span>
                                     </button>
+                                    <p className="text-center text-[10px] text-gray-400 font-medium mt-3">
+                                        You are downloading the original, immutable certificate from IPFS.
+                                    </p>
                                 </div>
 
-                                {/* Hidden Certificate Component for PDF Export */}
-                                <div className="hidden">
-                                    <div
-                                        ref={certificateRef}
-                                        className="w-[1000px] p-20 bg-white border-[20px] border-blue-50 flex flex-col items-center text-center space-y-10 font-sans"
-                                    >
-                                        <div className="w-full flex justify-between items-start">
-                                            <ShieldCheck className="h-16 w-16 text-primary" />
-                                            <div className="text-right">
-                                                <p className="text-sm font-bold text-gray-300 tracking-widest uppercase">Official Record</p>
-                                                <p className="text-xs font-mono text-gray-400">{selectedCert?.certId}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <h1 className="text-6xl font-black text-gray-900 tracking-tighter">Certificate of Completion</h1>
-                                            <div className="h-1.5 w-40 bg-primary mx-auto rounded-full" />
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <p className="text-xl text-gray-400 font-medium italic">This is to certify that</p>
-                                            <h2 className="text-5xl font-black text-primary">{selectedCert?.studentName}</h2>
-                                            <p className="text-xl text-gray-400 font-medium max-w-2xl mx-auto">
-                                                has successfully completed the requirements for the course
-                                            </p>
-                                            <h3 className="text-3xl font-bold text-gray-900">{selectedCert?.courseName}</h3>
-                                            <div className="flex justify-center gap-12 pt-4">
-                                                <div className="text-center">
-                                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Grade</p>
-                                                    <p className="text-lg font-bold text-gray-900">{selectedCert?.grade}</p>
-                                                </div>
-                                                <div className="text-center">
-                                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Institution</p>
-                                                    <p className="text-lg font-bold text-gray-900">{selectedCert?.institutionName}</p>
-                                                </div>
-                                                <div className="text-center">
-                                                    <p className="text-[10px] uppercase font-black tracking-widest text-gray-300">Issue Date</p>
-                                                    <p className="text-lg font-bold text-gray-900">{formatDate(selectedCert?.issueDate)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col items-center space-y-4 pt-10 border-t border-gray-50 w-full opacity-60">
-                                            <QRCodeSVG
-                                                value={`${window.location.origin}/verify/${selectedCert?.certId}`}
-                                                size={80}
-                                            />
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
-                                                VERIFIED ON POLYGON BLOCKCHAIN • #{selectedCert?.txHash.slice(0, 12)}...
-                                            </p>
-                                        </div>
+                                {/* Sharing */}
+                                <div className="space-y-4 pt-4 border-t border-gray-50">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Share & Verify</h4>
+                                    <div className="flex gap-3">
+                                        <button onClick={() => shareSocial('linkedin', selectedCert)} className="flex-1 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-100 transition">
+                                            <Linkedin className="h-5 w-5" />
+                                        </button>
+                                        <button onClick={() => shareSocial('whatsapp', selectedCert)} className="flex-1 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center hover:bg-green-100 transition">
+                                            <MessageCircle className="h-5 w-5" />
+                                        </button>
+                                        <button onClick={() => shareSocial('email', selectedCert)} className="flex-1 h-12 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
+                                            <Mail className="h-5 w-5" />
+                                        </button>
+                                        <button onClick={() => handleCopyLink(selectedCert.certId)} className="flex-1 h-12 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center hover:bg-gray-100 transition">
+                                            <Copy className="h-5 w-5" />
+                                        </button>
                                     </div>
+                                </div>
+
+                                {/* Advanced / Technical Details (Collapsible) */}
+                                <div className="pt-2">
+                                    <button
+                                        onClick={() => setShowAdvanced(!showAdvanced)}
+                                        className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gray-600 transition"
+                                    >
+                                        {showAdvanced ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                        <span>Advanced Technical Details</span>
+                                    </button>
+
+                                    {showAdvanced && (
+                                        <div className="mt-4 p-4 bg-gray-50 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-200">
+                                            <div>
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Registry Reference (ID)</label>
+                                                <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-gray-100 mt-1">
+                                                    <span className="font-mono text-[10px] text-gray-600 truncate">{selectedCert.certId}</span>
+                                                    <button onClick={() => handleCopyLink(selectedCert.certId)} className="text-gray-400 hover:text-primary">
+                                                        <Copy className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-2">
+                                                <a
+                                                    href={`https://amoy.polygonscan.com/tx/${selectedCert.txHash}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full py-2.5 px-4 bg-white border border-gray-200 rounded-xl text-[10px] font-bold text-gray-600 hover:border-primary hover:text-primary transition flex items-center justify-center space-x-2"
+                                                >
+                                                    <ShieldCheck className="h-3 w-3" />
+                                                    <span>View Blockchain Proof</span>
+                                                </a>
+                                                <button
+                                                    onClick={() => downloadQR(selectedCert.certId)}
+                                                    className="w-full py-2.5 px-4 bg-white border border-gray-200 rounded-xl text-[10px] font-bold text-gray-600 hover:border-primary hover:text-primary transition flex items-center justify-center space-x-2"
+                                                >
+                                                    <QrCode className="h-3 w-3" />
+                                                    <span>Download QR Image</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                             </div>

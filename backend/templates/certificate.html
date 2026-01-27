@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificate</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        /* Google Fonts Removed for Print Reliability */
+        /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap'); */
+
+        /* Force A4 Page Size for PDF Generation */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
 
         :root {
             --primary: #1E40AF;
@@ -21,27 +28,40 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
-            background: white;
+            /* Use system font stack that mimics Inter/Swiss typography */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple
+ Color Emoji", " Segoe UI Emoji", " Segoe UI Symbol";
+
+                background: white;
+            /* Ensure white background for print */
             color: var(--gray-900);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            /* Remove flex center to let flow naturally in print */
+            display: block;
+            width: 210mm;
+            height: 297mm;
         }
 
         .certificate-container {
-            width: 1000px;
-            height: 700px;
-            padding: 60px;
-            background: white;
-            border: 20px solid var(--gray-50);
+            width: 210mm;
+            height: 297mm;
+            padding: 20mm;
+            /* Use mm for print consistency */
+            /* Ensure the content box fits within 210mm width including padding if box-sizing is border-box */
             box-sizing: border-box;
+            background: white;
+            border: 10mm solid var(--gray-50);
+            /* Adjusted border size */
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             position: relative;
+
+            /* Prevent page breaks inside the certificate container */
+            page-break-inside: avoid;
+            break-inside: avoid;
+            overflow: hidden;
+            /* Safety against spillover */
         }
 
         .header {
@@ -49,12 +69,12 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 40px;
+            margin-bottom: 10mm;
         }
 
         .logo-placeholder {
-            width: 64px;
-            height: 64px;
+            width: 20mm;
+            height: 20mm;
             color: var(--primary);
         }
 
@@ -78,15 +98,17 @@
         }
 
         .title-section {
-            margin-bottom: 40px;
+            margin-bottom: 10mm;
         }
 
         .title-section h1 {
-            font-size: 60px;
+            font-size: 48px;
+            /* Slightly reduced to ensure fit */
             font-weight: 900;
             margin: 0;
             letter-spacing: -2px;
             color: var(--gray-900);
+            line-height: 1.1;
         }
 
         .divider {
@@ -95,6 +117,8 @@
             background: var(--primary);
             margin: 20px auto;
             border-radius: 99px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .content {
@@ -102,42 +126,47 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
+            /* Reduced gap */
         }
 
         .certify-text {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--gray-400);
             font-style: italic;
             margin: 0;
         }
 
         .student-name {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 900;
             color: var(--primary);
             margin: 0;
+            line-height: 1.2;
         }
 
         .course-text {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--gray-400);
             max-width: 600px;
             margin: 0 auto;
         }
 
         .course-name {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--gray-900);
             margin: 10px 0;
+            line-height: 1.3;
         }
 
         .stats-grid {
             display: flex;
             justify-content: center;
-            gap: 60px;
-            margin-top: 40px;
+            gap: 40px;
+            margin-top: 10mm;
+            flex-wrap: wrap;
+            /* Safety for narrower widths */
         }
 
         .stat-item {
@@ -155,25 +184,28 @@
         }
 
         .stat-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--gray-900);
         }
 
         .footer {
             width: 100%;
-            padding-top: 40px;
+            padding-top: 10mm;
             border-top: 1px solid var(--gray-50);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             opacity: 0.8;
+            margin-top: auto;
+            /* Push to bottom if space permits */
         }
 
         .qr-code {
-            width: 100px;
-            height: 100px;
+            width: 25mm;
+            /* Fixed print size */
+            height: 25mm;
         }
 
         .qr-code img {
@@ -182,7 +214,7 @@
         }
 
         .verification-text {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 900;
             color: var(--gray-400);
             text-transform: uppercase;
@@ -195,8 +227,9 @@
         }
 
         .student-photo {
-            width: 120px;
-            height: 140px;
+            width: 30mm;
+            height: 38mm;
+            /* Standard passphoto ratio approx */
             border: 4px solid var(--gray-100);
             border-radius: 12px;
             overflow: hidden;

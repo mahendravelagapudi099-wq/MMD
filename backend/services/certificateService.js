@@ -55,8 +55,10 @@ class CertificateService {
 
             const pdfBuffer = await page.pdf({
                 format: 'A4',
-                landscape: true,
+                landscape: false,
                 printBackground: true,
+                preferCSSPageSize: true, // Key fix: respect @page CSS
+                displayHeaderFooter: false, // Ensure no browser headers
                 margin: {
                     top: '0px',
                     right: '0px',
@@ -64,6 +66,11 @@ class CertificateService {
                     left: '0px'
                 }
             });
+
+            // Note: Puppeteer's page.pdf() doesn't directly support metadata in the options object 
+            // in all versions, but we can ensure standard properties are set. 
+            // If advanced metadata is needed, we'd need a post-processing library like pdf-lib.
+            // For now, sticking to pure Puppeteer as requested.
 
             await browser.close();
             return pdfBuffer;
